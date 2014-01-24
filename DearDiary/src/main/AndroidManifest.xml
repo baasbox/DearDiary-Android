@@ -25,13 +25,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.baasbox.deardiary.ui.NoteListActivity" />
         </activity>
-    <activity android:name=".ui.EditActivity"/>
+
+
+        <activity
+                android:name=".ui.LoginActivity"
+                android:label="@string/title_activity_login"
+                android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
+
+        <activity android:name="com.baasbox.deardiary.ui.EditActivity"
+                  android:windowSoftInputMode="adjustResize|stateVisible"/>
+
         <provider
-            android:name=".provider.DiaryProvider"
+            android:name="com.baasbox.deardiary.provider.DiaryProvider"
             android:authorities="com.baasbox.deardiary.provider"
             android:enabled="true"
             android:exported="false" >
         </provider>
+
     </application>
 
 </manifest>

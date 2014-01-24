@@ -25,6 +25,8 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_diary_list);
         mListFragment = (NotesListFragment)getSupportFragmentManager().findFragmentById(R.id.ItemList);
 
@@ -36,6 +38,12 @@ public class NoteListActivity extends ActionBarActivity
         // handle intents
     }
 
+    private void startLoginScreen(){
+        Intent intent = new Intent(this,LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu);
