@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/activity_h_margins">
+    <TextView
+            android:id="@+id/tv_diary_note_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/textAppearanceLarge"
+            android:textIsSelectable="true"/>
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        <TextView
+                android:id="@+id/tv_diary_note_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"
+                style="?android:attr/textAppearanceMedium"/>
+    </ScrollView>
+    <TextView
+            android:id="@+id/tv_diary_note_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/textAppearanceSmall"
+            android:gravity="right"
+            tools:text="data"
+            android:textIsSelectable="true"/>
+
+</LinearLayout>
