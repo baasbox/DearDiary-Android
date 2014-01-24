@@ -12,7 +12,7 @@ class NotesAdapter extends SimpleCursorAdapter {
 
     private static final String[] FROM ={
             Contract.Notes._TITLE,
-            Contract.Notes._DATE
+            Contract.Notes._TITLE
     };
 
     private static final int[] TO = {

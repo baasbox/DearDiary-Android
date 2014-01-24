@@ -13,10 +13,10 @@ class NotesLoader extends CursorLoader {
             {
                     Contract.Notes._ID,
                     Contract.Notes._TITLE,
-                    Contract.Notes._DATE
+
             };
 
-    private final static String SORT = Contract.Notes._DATE+ " ASC";
+    private final static String SORT = Contract.Notes._TITLE+ " ASC";
 
     NotesLoader(Context context) {
         super(context, Contract.Notes.CONTENT_URI, PROJECTION, null, null, SORT);

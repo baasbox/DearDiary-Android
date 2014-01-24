@@ -3,8 +3,14 @@ package com.baasbox.deardiary.ui;
 import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import com.baasbox.android.BaasDocument;
+import com.baasbox.android.BaasHandler;
+import com.baasbox.android.BaasResult;
+import com.baasbox.android.SaveMode;
 import com.baasbox.deardiary.R;
 import com.baasbox.deardiary.model.Contract;
 
@@ -14,13 +20,13 @@ import com.baasbox.deardiary.model.Contract;
 public class EditActivity extends ActionBarActivity {
 
     private AddNoteFragment mAddNotes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_list);
         mAddNotes = (AddNoteFragment)getSupportFragmentManager().findFragmentById(R.id.Edit);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -33,12 +39,27 @@ public class EditActivity extends ActionBarActivity {
         if (item.getItemId()==R.id.add_note_action){
             ContentValues values = mAddNotes.getData();
             getContentResolver().insert(Contract.Notes.CONTENT_URI,values);
-            setResult(RESULT_OK);
-            finish();
+            saveOnBaasBox(values);
 
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void saveOnBaasBox(ContentValues values){
+        BaasDocument document = new BaasDocument("memos",values);
+        document.save(SaveMode.IGNORE_VERSION,uploadHandler);
+    }
+
+    private final BaasHandler<BaasDocument> uploadHandler = new BaasHandler<BaasDocument>() {
+        @Override
+        public void handle(BaasResult<BaasDocument> doc) {
+            if(doc.isSuccess()){
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                Log.d("ERROR","Failed with error",doc.error());
+            }
+        }
+    };
 }

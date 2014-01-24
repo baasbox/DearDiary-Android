@@ -27,9 +27,8 @@ public final class Contract  {
         public final static String ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE+"/vnd.deardiary";
 
         public final static String _ID = BaseColumns._ID;
-        public final static String _TITLE = "_title";
-        public final static String _CONTENT = "_content";
-        public final static String _DATE = "_date";
+        public final static String _TITLE = "title";
+        public final static String _CONTENT = "content";
 
         public static Note loadNote(ContentResolver cr,Uri uri){
             Cursor c = null;

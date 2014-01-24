@@ -3,6 +3,7 @@ package com.baasbox.deardiary.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -13,6 +14,9 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.baasbox.android.BaasHandler;
+import com.baasbox.android.BaasResult;
+import com.baasbox.android.BaasUser;
 import com.baasbox.deardiary.R;
 
 /**
@@ -38,7 +42,9 @@ public class LoginActivity extends FragmentActivity {
         mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
         mUserView = (EditText) findViewById(R.id.email);
         mUserView.setText(mUsername);
-
+        mLoginStatusView = findViewById(R.id.login_status);
+        mLoginFormView = findViewById(R.id.login_form);
+        mLoginStatusMessageView = (TextView)findViewById(R.id.login_status_message);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -70,6 +76,9 @@ public class LoginActivity extends FragmentActivity {
         showProgress(false);
 
         if (success) {
+            Intent intent = new Intent(this,NoteListActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             finish();
         } else {
             mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -123,8 +132,28 @@ public class LoginActivity extends FragmentActivity {
             // perform the user login attempt.
             mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
             showProgress(true);
+            signupWithBaasBox(newUser);
         }
     }
+
+    private void signupWithBaasBox(boolean newUser){
+        //todo 3.1
+        BaasUser user = BaasUser.withUserName(mUsername);
+        if (newUser) {
+            user.signup(mPassword,onComplete);
+        } else {
+            user.login(mPassword,onComplete);
+        }
+    }
+
+    //todo 3.2
+    private final BaasHandler<BaasUser> onComplete =
+            new BaasHandler<BaasUser>() {
+                @Override
+                public void handle(BaasResult<BaasUser> result) {
+                    completeLogin(result.isSuccess());
+                }
+            };
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {

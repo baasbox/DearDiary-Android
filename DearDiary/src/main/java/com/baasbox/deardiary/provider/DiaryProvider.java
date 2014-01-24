@@ -123,14 +123,13 @@ public class DiaryProvider extends ContentProvider {
     }
 
     private final static String DB_NAME = "deardiary.db";
-    private final static int DB_VERSION = 2;
+    private final static int DB_VERSION = 3;
 
     //language=SQLite
     private final static String CREATE_TABLE = "create table if not exists "+ Contract.Notes.PATH+
             "("+Contract.Notes._ID+ " integer primary key autoincrement," +
             Contract.Notes._TITLE+" text not null," +
-            Contract.Notes._CONTENT+" text not null default ('')," +
-            Contract.Notes._DATE+" text)";
+            Contract.Notes._CONTENT+" text not null default (''))";
 
     //language=SQLite
     private final static String DROP_TABLE = "drop table if exists "+Contract.Notes.PATH;

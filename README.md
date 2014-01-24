@@ -35,6 +35,93 @@ After refreshing your ide, you should be able to use the sdk classes in your pro
 ## Setup the client library
 The BaasBox service could be installed anywhere on the web
 so you probably need to configure it a bit.
-We suggest to initialize the client as soon as possible in your
-*Application* class. The starter project includes the DearDiary.
-Open the java file and
+We suggest to initialize the client in your
+*Application* onCreate method.
+The starter project includes an empty DearDiary class.
+Open the java file and add the following lines:
+```java
+
+    private BaasBox box;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        BaasBox.Config config = new BaasBox.Config();
+        config.API_DOMAIN = "10.0.0.2"; // the host address
+        config.APP_CODE = "1234567890"; // your appcode
+        config.HTTP_PORT = 9000; // your port
+
+        box = BaasBox.initDefault(this,config);
+    }
+```
+
+Also don't forget to add the required internet permissions
+to your manifest:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+After all you are going to connect to a backend!!!
+
+With this setup you are ready to use the sdk in your app.
+Don't forget to customize the configuration to adapt it to your environment.
+
+## Authenticate with the server
+BaasBox provides means for authenticatication, so that different user
+can be distinguished on the backed.
+The sample project includes a barebone LoginActivity, we are going to integrate it in
+the app.
+
+The first thing to do is to check if there is alrady an an authenticated user for this device.
+Open the NoteListActivity file and right at the start of onCreate, where is the *todo 1* mark
+add the following lines.
+
+```java
+if (BaasUser.current() == null){
+            startLoginScreen();
+            return;
+}
+```
+
+BaasBox sdk remembers the currently logged in user.
+```java BaasUser.current() ``` will return the current one
+or null if no one is logged in, in this case we will start the login screen.
+
+Now in the LoginActivity search for the two todo items for you.
+This is your first call to BaasBox:
+
+```java
+private void signupWithBaasBox(boolean newUser){
+        //todo 3.1
+        BaasUser user = BaasUser.withUserName(mUsername);
+        if (newUser) {
+            user.signup(mPassword,onComplete);
+        } else {
+            user.login(mPassword,onComplete);
+        }
+    }
+//todo 3.2
+private final BaasHandler<BaasUser> onComplete =
+    new BaasHandler<BaasUser>() {
+        @Override
+        public void handle(BaasResult<BaasUser> result) {
+            if(result.isSuccess()){
+                completeLogin(true);
+            } else {
+                Log.d(TAG,result.error().toString());
+                completeLogin(false);
+            }
+        }
+    };
+```
+
+you can login or signup using methods of the BaasUser class,they obviously are
+*signup* and *login*.
+You obtain an instance of a user through the factory method:
+```BaasUser.withUserName(...);```
+
+These methods are executed asynchronously so you need to pass
+a callback to be invoked upon completion, in this case the **onComplete**
+variable. The callback will receive the result of the rest api call, or possibly
+an error you can inspect docs of the methods of BaasResult<T> to see how it works in details.

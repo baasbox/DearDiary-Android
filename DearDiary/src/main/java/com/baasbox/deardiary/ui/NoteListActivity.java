@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.baasbox.android.BaasUser;
 import com.baasbox.deardiary.R;
 import com.baasbox.deardiary.model.Contract;
 
@@ -25,7 +26,11 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        //todo 2
+        if (BaasUser.current() == null){
+            startLoginScreen();
+            return;
+        }
 
         setContentView(R.layout.activity_diary_list);
         mListFragment = (NotesListFragment)getSupportFragmentManager().findFragmentById(R.id.ItemList);
