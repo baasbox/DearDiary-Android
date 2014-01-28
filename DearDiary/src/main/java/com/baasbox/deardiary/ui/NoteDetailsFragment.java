@@ -1,16 +1,13 @@
 package com.baasbox.deardiary.ui;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.baasbox.android.BaasDocument;
 import com.baasbox.deardiary.R;
-import com.baasbox.deardiary.model.Contract;
-import com.baasbox.deardiary.model.Note;
 
 
 /**
@@ -20,7 +17,7 @@ public class NoteDetailsFragment extends Fragment {
 
     static final String CURRENTLY_SHOWN_ITEM_KEY = "currently_shown_item";
 
-    private Note mNote;
+    private BaasDocument mNote;
 
     private TextView mTitleView;
     private TextView mContentView;
@@ -30,8 +27,7 @@ public class NoteDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments().containsKey(CURRENTLY_SHOWN_ITEM_KEY)){
-            Uri uri = getArguments().getParcelable(CURRENTLY_SHOWN_ITEM_KEY);
-            mNote = Contract.Notes.loadNote(getActivity().getContentResolver(),uri);
+            mNote = getArguments().getParcelable(CURRENTLY_SHOWN_ITEM_KEY);
         }
     }
 
@@ -47,8 +43,8 @@ public class NoteDetailsFragment extends Fragment {
 
     private void refreshViews(){
         if (mNote!=null) {
-            mTitleView.setText(mNote.getTitle());
-            mContentView.setText(mNote.getNote());
+            mTitleView.setText(mNote.getString("title"));
+            mContentView.setText(mNote.getString("content"));
         }
     }
 

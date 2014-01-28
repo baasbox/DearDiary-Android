@@ -22,7 +22,7 @@ public class NotesDetailsActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             Bundle args = new Bundle();
             args.putParcelable(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY,
-                           getIntent().getData());
+                           getIntent().getParcelableExtra(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY));
             NoteDetailsFragment fragment = new NoteDetailsFragment();
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()

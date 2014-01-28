@@ -1,28 +1,34 @@
 package com.baasbox.deardiary.ui;
 
-import android.content.ContentUris;
-import android.content.ContentValues;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.baasbox.android.BaasUser;
+import com.baasbox.android.*;
 import com.baasbox.deardiary.R;
-import com.baasbox.deardiary.model.Contract;
+
+import java.util.List;
 
 /**
  * Created by Andrea Tortorella on 24/01/14.
  */
 public class NoteListActivity extends ActionBarActivity
     implements NotesListFragment.Callbacks,AddNoteFragment.OnAddNote {
+    private final static String REFRESH_TOKEN_KEY = "refresh";
+    private final static String SAVING_TOKEN_KEY = "saving";
 
     private final static int EDIT_CODE = 1;
 
     private boolean mUseTwoPane;
     private NotesListFragment mListFragment;
+    private RequestToken mRefresh;
+    private RequestToken mSaving;
+
+    private ProgressDialog mDialog;
+    private boolean mDoRefresh;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +38,17 @@ public class NoteListActivity extends ActionBarActivity
             return;
         }
 
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Refreshing...");
+
+        if (savedInstanceState!=null){
+            mRefresh = savedInstanceState.getParcelable(REFRESH_TOKEN_KEY);
+            mSaving = savedInstanceState.getParcelable(SAVING_TOKEN_KEY);
+        }
+        mDoRefresh = savedInstanceState==null;
+
         setContentView(R.layout.activity_diary_list);
+
         mListFragment = (NotesListFragment)getSupportFragmentManager().findFragmentById(R.id.ItemList);
 
         if (findViewById(R.id.fragment_host) != null) {
@@ -41,6 +57,46 @@ public class NoteListActivity extends ActionBarActivity
         }
 
         // handle intents
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSaving!=null||mRefresh!=null){
+            mDialog.show();
+        }
+
+        if (mSaving!=null){
+            mSaving.resume(onSave);
+        }
+
+        if (mRefresh!=null){
+            mRefresh.resume(onRefresh);
+        } else if(mDoRefresh){
+            refreshDocuments();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mDialog.isShowing()){
+            mDialog.dismiss();
+        }
+        if (mRefresh!=null){
+            mRefresh.suspend();
+        }
+        if (mSaving!=null){
+            mSaving.suspend();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mRefresh!=null){
+            outState.putParcelable(REFRESH_TOKEN_KEY,mRefresh);
+        }
     }
 
     private void startLoginScreen(){
@@ -74,11 +130,10 @@ public class NoteListActivity extends ActionBarActivity
     }
 
     @Override
-    public void onItemSelected(long id) {
-        Uri uri = ContentUris.withAppendedId(Contract.Notes.CONTENT_URI,id);
+    public void onItemSelected(BaasDocument document) {
         if (mUseTwoPane) {
             Bundle args = new Bundle();
-            args.putParcelable(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY, uri);
+            args.putParcelable(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY, document);
             NoteDetailsFragment fragment = new NoteDetailsFragment();
             fragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
@@ -86,13 +141,52 @@ public class NoteListActivity extends ActionBarActivity
                     .commit();
         } else {
             Intent details = new Intent(this,NotesDetailsActivity.class);
-            details.setData(uri);
+            details.putExtra(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY,document);
             startActivity(details);
         }
     }
 
     @Override
-    public void onAddNote(ContentValues v) {
-        getContentResolver().insert(Contract.Notes.CONTENT_URI,v);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode==EDIT_CODE){
+            if (resultCode==RESULT_OK){
+                refreshDocuments();
+            }
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
+
+    private void refreshDocuments(){
+        mDialog.show();
+        mRefresh =BaasDocument.fetchAll("memos",onRefresh);
+    }
+
+    private final BaasHandler<List<BaasDocument>>
+        onRefresh = new BaasHandler<List<BaasDocument>>() {
+        @Override
+        public void handle(BaasResult<List<BaasDocument>> result) {
+            if (result.isSuccess()){
+                mDialog.dismiss();
+                mRefresh=null;
+                mListFragment.refresh(result.value());
+            }
+        }
+    };
+
+    @Override
+    public void onAddNote(BaasDocument document) {
+        mDialog.show();
+        mSaving =document.save(SaveMode.IGNORE_VERSION,onSave);
+    }
+
+    private final BaasHandler<BaasDocument> onSave =
+            new BaasHandler<BaasDocument>() {
+                @Override
+                public void handle(BaasResult<BaasDocument> baasDocumentBaasResult) {
+                    mSaving=null;
+                    mDialog.dismiss();
+                    refreshDocuments();
+                }
+            };
 }

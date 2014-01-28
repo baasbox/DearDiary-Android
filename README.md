@@ -95,10 +95,11 @@ This is your first call to BaasBox:
 private void signupWithBaasBox(boolean newUser){
         //todo 3.1
         BaasUser user = BaasUser.withUserName(mUsername);
+        user.setPassword(mPassword);
         if (newUser) {
-            user.signup(mPassword,onComplete);
+            user.signup(onComplete);
         } else {
-            user.login(mPassword,onComplete);
+            user.login(onComplete);
         }
     }
 //todo 3.2
@@ -119,7 +120,9 @@ private final BaasHandler<BaasUser> onComplete =
 you can login or signup using methods of the BaasUser class,they obviously are
 *signup* and *login*.
 You obtain an instance of a user through the factory method:
-```BaasUser.withUserName(...);```
+```java
+BaasUser.withUserName(...);
+```
 
 These methods are executed asynchronously so you need to pass
 a callback to be invoked upon completion, in this case the **onComplete**

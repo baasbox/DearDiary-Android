@@ -1,19 +1,13 @@
 package com.baasbox.deardiary.ui;
 
 import android.app.Activity;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import com.baasbox.android.BaasDocument;
-import com.baasbox.android.BaasResult;
-import com.baasbox.android.v4.utils.BaasDocumentLoader;
-import com.baasbox.deardiary.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,14 +17,21 @@ import java.util.List;
 public class NotesListFragment extends ListFragment {
 
     private final static String CURRENTLY_SELECTED_ITEM_KEY = "currently_selected_item";
+    private final static String SAVED_DOCS = "saved_docs";
+
+    public void refresh(List<BaasDocument> docs) {
+        mDocuments.clear();
+        mDocuments.addAll(docs);
+        getListAdapter().notifyDataSetChanged();
+    }
 
     public interface Callbacks {
-        public void onItemSelected(long itemId);
+        public void onItemSelected(BaasDocument document);
     }
 
     private final static Callbacks sNoopCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(long itemId) {
+        public void onItemSelected(BaasDocument document) {
         }
     };
 
@@ -38,11 +39,17 @@ public class NotesListFragment extends ListFragment {
 
     private Callbacks mCallbacks;
     private NotesAdapter mAdapter;
+    private ArrayList<BaasDocument> mDocuments;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new NotesAdapter(getActivity());
+        if (savedInstanceState==null){
+            mDocuments = new ArrayList<BaasDocument>();
+        } else {
+            mDocuments = savedInstanceState.getParcelableArrayList(SAVED_DOCS);
+        }
+        mAdapter = new NotesAdapter(getActivity(),mDocuments);
         setListAdapter(mAdapter);
     }
 
@@ -64,11 +71,6 @@ public class NotesListFragment extends ListFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mCallbacks = sNoopCallbacks;
@@ -80,6 +82,8 @@ public class NotesListFragment extends ListFragment {
         if (mSelectedPostion!=ListView.INVALID_POSITION){
             outState.putInt(CURRENTLY_SELECTED_ITEM_KEY,mSelectedPostion);
         }
+        outState.putParcelableArrayList(SAVED_DOCS,mDocuments);
+
     }
 
     public void setActivateOnItemClick(boolean activateOnItemClick){
@@ -89,9 +93,14 @@ public class NotesListFragment extends ListFragment {
     }
 
     @Override
+    public NotesAdapter getListAdapter() {
+        return (NotesAdapter)super.getListAdapter();
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        mCallbacks.onItemSelected(id);
+        mCallbacks.onItemSelected(getListAdapter().getItem(position));
     }
 
     private void setActivatedPosition(int position) {

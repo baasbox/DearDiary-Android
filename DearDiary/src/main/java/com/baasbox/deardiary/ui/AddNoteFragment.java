@@ -3,7 +3,6 @@ package com.baasbox.deardiary.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -11,8 +10,8 @@ import android.support.v4.app.DialogFragment;
 import android.util.AttributeSet;
 import android.view.*;
 import android.widget.EditText;
+import com.baasbox.android.BaasDocument;
 import com.baasbox.deardiary.R;
-import com.baasbox.deardiary.model.Contract;
 
 /**
  * Created by Andrea Tortorella on 24/01/14.
@@ -24,14 +23,14 @@ public class AddNoteFragment extends DialogFragment {
     private boolean mShowAsDialog;
 
     public interface OnAddNote {
-        public void onAddNote(ContentValues values);
+        public void onAddNote(BaasDocument values);
     }
 
     private OnAddNote mListener;
 
     private final static OnAddNote NOOP = new OnAddNote() {
         @Override
-        public void onAddNote(ContentValues values) {
+        public void onAddNote(BaasDocument values) {
         }
     };
 
@@ -92,18 +91,19 @@ public class AddNoteFragment extends DialogFragment {
     }
 
 
-    public ContentValues getData() {
+    public BaasDocument getData() {
         String title = mTitle.getText().toString();
         String content  = mTitle.getText().toString();
-        ContentValues values = new ContentValues();
-        values.put(Contract.Notes._TITLE,title);
-        values.put(Contract.Notes._CONTENT,content);
-        return values;
+        BaasDocument doc = new BaasDocument("memos");
+        doc.putString("title",title);
+        doc.putString("content",content);
+        return doc;
     }
 
     private void dispatchAddNote(){
         mListener.onAddNote(getData());
     }
+
     private final DialogInterface.OnClickListener fOk = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
