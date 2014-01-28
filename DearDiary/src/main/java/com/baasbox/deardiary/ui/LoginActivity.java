@@ -3,6 +3,7 @@ package com.baasbox.deardiary.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,13 +18,14 @@ import android.widget.TextView;
 import com.baasbox.android.BaasHandler;
 import com.baasbox.android.BaasResult;
 import com.baasbox.android.BaasUser;
+import com.baasbox.android.RequestToken;
 import com.baasbox.deardiary.R;
 
 /**
  * Created by Andrea Tortorella on 24/01/14.
  */
 public class LoginActivity extends FragmentActivity {
-
+    private final static String SIGNUP_TOKEN_KEY = "signup_token_key";
     public static final String EXTRA_USERNAME = "com.baasbox.deardiary.username.EXTRA";
 
     private String mUsername;
@@ -35,10 +37,19 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
 
+
+
+    private RequestToken mSignupOrLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        if (savedInstanceState!=null){
+            mSignupOrLogin = savedInstanceState.getParcelable(SIGNUP_TOKEN_KEY);
+        }
+
         mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
         mUserView = (EditText) findViewById(R.id.email);
         mUserView.setText(mUsername);
@@ -72,9 +83,35 @@ public class LoginActivity extends FragmentActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mSignupOrLogin!=null){
+            showProgress(false);
+            mSignupOrLogin.suspend();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSignupOrLogin!=null){
+            showProgress(true);
+            mSignupOrLogin.resume(onComplete);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mSignupOrLogin!=null){
+            outState.putParcelable(SIGNUP_TOKEN_KEY,mSignupOrLogin);
+        }
+    }
+
     private void completeLogin(boolean success){
         showProgress(false);
-
+        mSignupOrLogin = null;
         if (success) {
             Intent intent = new Intent(this,NoteListActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -141,9 +178,9 @@ public class LoginActivity extends FragmentActivity {
         BaasUser user = BaasUser.withUserName(mUsername);
         user.setPassword(mPassword);
         if (newUser) {
-            user.signup(onComplete);
+            mSignupOrLogin=user.signup(onComplete);
         } else {
-            user.login(onComplete);
+            mSignupOrLogin=user.login(onComplete);
         }
     }
 
@@ -152,6 +189,7 @@ public class LoginActivity extends FragmentActivity {
             new BaasHandler<BaasUser>() {
                 @Override
                 public void handle(BaasResult<BaasUser> result) {
+                    mSignupOrLogin = null;
                     completeLogin(result.isSuccess());
                 }
             };
