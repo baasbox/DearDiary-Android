@@ -38,7 +38,6 @@ public final class Contract  {
                     Note n = new Note();
                     n.setTitle(c.getString(c.getColumnIndexOrThrow(_TITLE)));
                     n.setNote(c.getString(c.getColumnIndexOrThrow(_CONTENT)));
-                    n.setDate(new Time());
                     return n;
                 }
                 return null;

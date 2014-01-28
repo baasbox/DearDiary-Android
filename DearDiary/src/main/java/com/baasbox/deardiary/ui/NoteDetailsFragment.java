@@ -49,7 +49,6 @@ public class NoteDetailsFragment extends Fragment {
         if (mNote!=null) {
             mTitleView.setText(mNote.getTitle());
             mContentView.setText(mNote.getNote());
-            Time time = mNote.getDate();
         }
     }
 

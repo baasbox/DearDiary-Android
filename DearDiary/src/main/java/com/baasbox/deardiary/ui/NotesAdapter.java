@@ -11,15 +11,14 @@ import com.baasbox.deardiary.model.Contract;
 class NotesAdapter extends SimpleCursorAdapter {
 
     private static final String[] FROM ={
-            Contract.Notes._TITLE,
             Contract.Notes._TITLE
     };
 
     private static final int[] TO = {
-        android.R.id.text1,
-        android.R.id.text2
+        android.R.id.text1
     };
+
     public NotesAdapter(Context context) {
-        super(context, android.R.layout.simple_list_item_2, null, FROM, TO, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        super(context, android.R.layout.simple_list_item_1, null, FROM, TO, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
     }
 }

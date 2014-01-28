@@ -78,7 +78,6 @@ public class NoteListActivity extends ActionBarActivity
         Uri uri = ContentUris.withAppendedId(Contract.Notes.CONTENT_URI,id);
         if (mUseTwoPane) {
             Bundle args = new Bundle();
-
             args.putParcelable(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY, uri);
             NoteDetailsFragment fragment = new NoteDetailsFragment();
             fragment.setArguments(args);
@@ -88,7 +87,6 @@ public class NoteListActivity extends ActionBarActivity
         } else {
             Intent details = new Intent(this,NotesDetailsActivity.class);
             details.setData(uri);
-//            details.putExtra(NoteDetailsFragment.CURRENTLY_SHOWN_ITEM_KEY,id);
             startActivity(details);
         }
     }

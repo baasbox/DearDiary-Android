@@ -1,7 +1,5 @@
 package com.baasbox.deardiary.model;
 
-import android.text.format.Time;
-
 
 /**
  * Created by Andrea Tortorella on 24/01/14.
@@ -11,7 +9,6 @@ public class Note {
     private String mId;
     private String mTitle;
     private String mNote;
-    private Time mDate;
 
     public Note(){}
 
@@ -22,6 +19,7 @@ public class Note {
     public void setId(String id) {
         mId = id;
     }
+
 
     public String getTitle() {
         return mTitle;
@@ -39,11 +37,4 @@ public class Note {
         mNote = note;
     }
 
-    public Time getDate() {
-        return mDate;
-    }
-
-    public void setDate(Time date) {
-        mDate = date;
-    }
 }

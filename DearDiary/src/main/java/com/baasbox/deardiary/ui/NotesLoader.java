@@ -13,7 +13,6 @@ class NotesLoader extends CursorLoader {
             {
                     Contract.Notes._ID,
                     Contract.Notes._TITLE,
-
             };
 
     private final static String SORT = Contract.Notes._TITLE+ " ASC";

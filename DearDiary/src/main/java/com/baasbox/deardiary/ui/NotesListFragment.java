@@ -6,11 +6,18 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import com.baasbox.android.BaasDocument;
+import com.baasbox.android.BaasResult;
+import com.baasbox.android.v4.utils.BaasDocumentLoader;
 import com.baasbox.deardiary.R;
 
+import java.util.List;
+
 /**
+ *
  * Created by Andrea Tortorella on 24/01/14.
  */
 public class NotesListFragment extends ListFragment {
@@ -59,7 +66,6 @@ public class NotesListFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(R.id.NOTES_LOADER,null,fLoaderCallbacks);
     }
 
     @Override
@@ -97,21 +103,4 @@ public class NotesListFragment extends ListFragment {
         mSelectedPostion = position;
     }
 
-
-    private final LoaderManager.LoaderCallbacks<Cursor> fLoaderCallbacks  =
-            new LoaderManager.LoaderCallbacks<Cursor>() {
-                @Override
-                public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-                    return new NotesLoader(getActivity());
-                }
-                @Override
-                public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-                    mAdapter.swapCursor(cursor);
-
-                }
-                @Override
-                public void onLoaderReset(Loader<Cursor> cursorLoader) {
-                    mAdapter.swapCursor(null);
-                }
-            };
 }

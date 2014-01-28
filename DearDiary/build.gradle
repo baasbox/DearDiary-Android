@@ -23,4 +23,5 @@ dependencies {
     compile 'com.android.support:support-v4:19.0.0'
     compile 'com.android.support:appcompat-v7:19.0.0'
     compile 'com.baasbox:baasbox-android:0.7.3-alpha'
+    compile 'com.google.android.gms:play-services:4.1.+'
 }

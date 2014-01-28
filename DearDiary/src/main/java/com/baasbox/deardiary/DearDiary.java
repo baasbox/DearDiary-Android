@@ -1,7 +1,10 @@
 package com.baasbox.deardiary;
 
 import android.app.Application;
+import android.util.Log;
 import com.baasbox.android.*;
+
+import java.util.List;
 
 /**
  * Created by Andrea Tortorella on 24/01/14.

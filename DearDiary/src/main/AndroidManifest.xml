@@ -3,7 +3,7 @@
     package="com.baasbox.deardiary" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
-
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <application
         android:name="com.baasbox.deardiary.DearDiary"
         android:allowBackup="true"
@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.baasbox.deardiary.ui.NotesDetailsActivity"
             android:label="@string/app_name"
@@ -27,7 +28,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.baasbox.deardiary.ui.NoteListActivity" />
         </activity>
-
 
         <activity
                 android:name=".ui.LoginActivity"

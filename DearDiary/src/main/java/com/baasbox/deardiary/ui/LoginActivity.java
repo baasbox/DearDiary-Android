@@ -139,10 +139,11 @@ public class LoginActivity extends FragmentActivity {
     private void signupWithBaasBox(boolean newUser){
         //todo 3.1
         BaasUser user = BaasUser.withUserName(mUsername);
+        user.setPassword(mPassword);
         if (newUser) {
-            user.signup(mPassword,onComplete);
+            user.signup(onComplete);
         } else {
-            user.login(mPassword,onComplete);
+            user.login(onComplete);
         }
     }
 
