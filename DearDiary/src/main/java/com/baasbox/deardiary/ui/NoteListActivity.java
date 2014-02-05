@@ -18,6 +18,7 @@ public class NoteListActivity extends ActionBarActivity
     implements NotesListFragment.Callbacks,AddNoteFragment.OnAddNote {
     private final static String REFRESH_TOKEN_KEY = "refresh";
     private final static String SAVING_TOKEN_KEY = "saving";
+    private final static String LOGOUT_TOKEN_KEY = "logout";
 
     private final static int EDIT_CODE = 1;
 
@@ -42,8 +43,12 @@ public class NoteListActivity extends ActionBarActivity
         mDialog.setMessage("Refreshing...");
 
         if (savedInstanceState!=null){
-            mRefresh = savedInstanceState.getParcelable(REFRESH_TOKEN_KEY);
-            mSaving = savedInstanceState.getParcelable(SAVING_TOKEN_KEY);
+            mRefresh = RequestToken.loadAndResume(savedInstanceState,REFRESH_TOKEN_KEY,onRefresh);
+            mSaving = RequestToken.loadAndResume(savedInstanceState,SAVING_TOKEN_KEY,onSave);
+            logoutToken = RequestToken.loadAndResume(savedInstanceState,LOGOUT_TOKEN_KEY,logoutHandler);
+        }
+        if (mSaving!=null||mRefresh!=null||logoutToken!=null){
+            mDialog.show();
         }
         mDoRefresh = savedInstanceState==null;
 
@@ -62,40 +67,58 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (mSaving!=null||mRefresh!=null){
-            mDialog.show();
-        }
-
-        if (mSaving!=null){
-            mSaving.resume(onSave);
-        }
-
-        if (mRefresh!=null){
-            mRefresh.resume(onRefresh);
-        } else if(mDoRefresh){
+//        if (mSaving!=null||mRefresh!=null){
+//            mDialog.show();
+//        }
+//
+//        if (mSaving!=null){
+//            mSaving.resume(onSave);
+//        }
+//
+//        if (mRefresh!=null){
+//            mRefresh.resume(onRefresh);
+//        } else
+        if(mRefresh==null&&mDoRefresh){
             refreshDocuments();
         }
+
+//        if (logoutToken!=null){
+//            logoutToken.resume(logoutHandler);
+//        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mDialog.isShowing()){
-            mDialog.dismiss();
-        }
-        if (mRefresh!=null){
-            mRefresh.suspend();
-        }
-        if (mSaving!=null){
-            mSaving.suspend();
-        }
+//        if (mDialog.isShowing()){
+//            mDialog.dismiss();
+//        }
+//        if (mRefresh!=null){
+//            mRefresh.suspend();
+//        }
+//        if (mSaving!=null){
+//            mSaving.suspend();
+////        }
+//        if (logoutToken!=null){
+//            logoutToken.suspend();
+//        }
+
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (mDialog.isShowing()){
+            mDialog.dismiss();
+        }
         if (mRefresh!=null){
-            outState.putParcelable(REFRESH_TOKEN_KEY,mRefresh);
+            mRefresh.suspendAndSave(outState,REFRESH_TOKEN_KEY);
+        }
+        if (mSaving!=null){
+            mSaving.suspendAndSave(outState,SAVING_TOKEN_KEY);
+        }
+        if (logoutToken!=null){
+            mSaving.suspendAndSave(outState,LOGOUT_TOKEN_KEY);
         }
     }
 
@@ -125,10 +148,26 @@ public class NoteListActivity extends ActionBarActivity
                 startActivityForResult(intent,EDIT_CODE);
             }
             return true;
+        } else if (item.getItemId()==R.id.logout_action){
+            BaasUser.current().logout(logoutHandler);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void onLogout(){
+        startLoginScreen();
+    }
+
+    private RequestToken logoutToken;
+    private final BaasHandler<Void> logoutHandler =
+            new BaasHandler<Void>() {
+                @Override
+                public void handle(BaasResult<Void> voidBaasResult) {
+                    logoutToken=null;
+                    onLogout();
+                }
+            };
     @Override
     public void onItemSelected(BaasDocument document) {
         if (mUseTwoPane) {
