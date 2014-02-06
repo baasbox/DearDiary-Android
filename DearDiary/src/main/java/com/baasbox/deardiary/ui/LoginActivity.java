@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
@@ -189,7 +190,11 @@ public class LoginActivity extends FragmentActivity {
             new BaasHandler<BaasUser>() {
                 @Override
                 public void handle(BaasResult<BaasUser> result) {
+
                     mSignupOrLogin = null;
+                    if (result.isFailed()){
+                        Log.d("ERROR","ERROR",result.error());
+                    }
                     completeLogin(result.isSuccess());
                 }
             };

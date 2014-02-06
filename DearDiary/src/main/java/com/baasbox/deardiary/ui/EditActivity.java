@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import com.baasbox.android.*;
 import com.baasbox.deardiary.R;
 
@@ -87,6 +88,7 @@ public class EditActivity extends ActionBarActivity {
                 setResult(RESULT_OK);
                 finish();
             } else {
+                Toast.makeText(EditActivity.this,"ERROR SAVING DOCUMENT",Toast.LENGTH_LONG).show();
                 Log.d("ERROR","Failed with error",doc.error());
             }
         }

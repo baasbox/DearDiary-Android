@@ -19,14 +19,10 @@ public class DearDiary extends Application {
         super.onCreate();
         //todo 1.2
         BaasBox.Config config = new BaasBox.Config();
-        config.AUTHENTICATION_TYPE= BaasBox.Config.AuthType.SESSION_TOKEN;
-        config.API_DOMAIN = "192.168.56.1"; // the host address
-        //config.APP_CODE = "123PinBox456"; // your appcode
-        //config.HTTP_PORT = 80; // your port
-
+        config.authenticationType= BaasBox.Config.AuthType.SESSION_TOKEN;
+        config.apiDomain = "192.168.56.1"; // the host address
+        config.httpPort=9000;
         box = BaasBox.initDefault(this,config);
-
-
     }
 
 }

@@ -4,8 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import com.baasbox.android.*;
 import com.baasbox.deardiary.R;
 
@@ -28,7 +30,7 @@ public class NoteListActivity extends ActionBarActivity
     private RequestToken mSaving;
 
     private ProgressDialog mDialog;
-    private boolean mDoRefresh;
+    private boolean mDoRefresh=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public class NoteListActivity extends ActionBarActivity
             mSaving = RequestToken.loadAndResume(savedInstanceState,SAVING_TOKEN_KEY,onSave);
             logoutToken = RequestToken.loadAndResume(savedInstanceState,LOGOUT_TOKEN_KEY,logoutHandler);
         }
+
         if (mSaving!=null||mRefresh!=null||logoutToken!=null){
             mDialog.show();
         }
@@ -60,57 +63,28 @@ public class NoteListActivity extends ActionBarActivity
             mUseTwoPane = true;
             mListFragment.setActivateOnItemClick(true);
         }
-
-        // handle intents
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        if (mSaving!=null||mRefresh!=null){
-//            mDialog.show();
-//        }
-//
-//        if (mSaving!=null){
-//            mSaving.resume(onSave);
-//        }
-//
-//        if (mRefresh!=null){
-//            mRefresh.resume(onRefresh);
-//        } else
         if(mRefresh==null&&mDoRefresh){
             refreshDocuments();
         }
-
-//        if (logoutToken!=null){
-//            logoutToken.resume(logoutHandler);
-//        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        if (mDialog.isShowing()){
-//            mDialog.dismiss();
-//        }
-//        if (mRefresh!=null){
-//            mRefresh.suspend();
-//        }
-//        if (mSaving!=null){
-//            mSaving.suspend();
-////        }
-//        if (logoutToken!=null){
-//            logoutToken.suspend();
-//        }
+        if (mDialog.isShowing()){
+            mDialog.dismiss();
+        }
 
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mDialog.isShowing()){
-            mDialog.dismiss();
-        }
         if (mRefresh!=null){
             mRefresh.suspendAndSave(outState,REFRESH_TOKEN_KEY);
         }
@@ -123,6 +97,7 @@ public class NoteListActivity extends ActionBarActivity
     }
 
     private void startLoginScreen(){
+        mDoRefresh = false;
         Intent intent = new Intent(this,LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -197,7 +172,7 @@ public class NoteListActivity extends ActionBarActivity
     }
 
     private void refreshDocuments(){
-        mDialog.show();
+        if(!mDialog.isShowing())mDialog.show();
         mRefresh =BaasDocument.fetchAll("memos",onRefresh);
     }
 
@@ -205,10 +180,13 @@ public class NoteListActivity extends ActionBarActivity
         onRefresh = new BaasHandler<List<BaasDocument>>() {
         @Override
         public void handle(BaasResult<List<BaasDocument>> result) {
+            mDialog.dismiss();
+            mRefresh=null;
             if (result.isSuccess()){
-                mDialog.dismiss();
-                mRefresh=null;
                 mListFragment.refresh(result.value());
+            } else {
+                Log.e("LOGERR","Error "+result.error().getMessage(),result.error());
+                Toast.makeText(NoteListActivity.this,"Error while talking with the box",Toast.LENGTH_LONG).show();
             }
         }
     };
