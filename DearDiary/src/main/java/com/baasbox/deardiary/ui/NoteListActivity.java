@@ -165,6 +165,10 @@ public class NoteListActivity extends ActionBarActivity
         if (requestCode==EDIT_CODE){
             if (resultCode==RESULT_OK){
                 refreshDocuments();
+            } else if(resultCode==EditActivity.RESULT_SESSION_EXPIRED){
+                startLoginScreen();
+            } else if (resultCode==EditActivity.RESULT_FAILED){
+                Toast.makeText(this,"Failed to add note",Toast.LENGTH_LONG).show();
             }
         }else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -182,10 +186,12 @@ public class NoteListActivity extends ActionBarActivity
         public void handle(BaasResult<List<BaasDocument>> result) {
             mDialog.dismiss();
             mRefresh=null;
-            if (result.isSuccess()){
-                mListFragment.refresh(result.value());
-            } else {
-                Log.e("LOGERR","Error "+result.error().getMessage(),result.error());
+            try {
+                mListFragment.refresh(result.get());
+            }catch (BaasInvalidSessionException e){
+                startLoginScreen();
+            }catch (BaasException e){
+                Log.e("LOGERR","Error "+e.getMessage(),e);
                 Toast.makeText(NoteListActivity.this,"Error while talking with the box",Toast.LENGTH_LONG).show();
             }
         }

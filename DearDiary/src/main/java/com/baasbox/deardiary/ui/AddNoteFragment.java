@@ -93,7 +93,7 @@ public class AddNoteFragment extends DialogFragment {
 
     public BaasDocument getData() {
         String title = mTitle.getText().toString();
-        String content  = mTitle.getText().toString();
+        String content  = mContent.getText().toString();
         BaasDocument doc = new BaasDocument("memos");
         doc.putString("title",title);
         doc.putString("content",content);

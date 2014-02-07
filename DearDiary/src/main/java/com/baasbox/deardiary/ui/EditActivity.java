@@ -1,5 +1,6 @@
 package com.baasbox.deardiary.ui;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -14,9 +15,15 @@ import com.baasbox.deardiary.R;
  * Created by Andrea Tortorella on 24/01/14.
  */
 public class EditActivity extends ActionBarActivity {
+    //todo
     private static final String PENDING_SAVE = "PENDING_SAVE";
+    public static final int RESULT_SESSION_EXPIRED = Activity.RESULT_FIRST_USER+1;
+    public static final int RESULT_FAILED = RESULT_SESSION_EXPIRED+1;
+
 
     private AddNoteFragment mAddNotes;
+
+    //todo
     private RequestToken mAddToken;
     private ProgressDialog mDialog;
 
@@ -28,33 +35,30 @@ public class EditActivity extends ActionBarActivity {
         mDialog.setMessage("Uploading...");
         mAddNotes = (AddNoteFragment)getSupportFragmentManager().findFragmentById(R.id.Edit);
         if (savedInstanceState!=null){
-            mAddToken = savedInstanceState.getParcelable(PENDING_SAVE);
+            mAddToken = RequestToken.loadAndResume(savedInstanceState,PENDING_SAVE,uploadHandler);
+            if(mAddToken!=null){
+                mDialog.show();
+            }
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mAddToken!=null){
-            mDialog.show();
-            mAddToken.resume(uploadHandler);
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mDialog.isShowing()){
-            mDialog.dismiss();
-        }
-        if (mAddToken!=null) mAddToken.suspend();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
         if (mAddToken!=null){
-            outState.putParcelable(PENDING_SAVE,mAddToken);
+            mAddToken.suspendAndSave(outState,PENDING_SAVE);
+            mDialog.dismiss();
         }
     }
 
@@ -84,12 +88,18 @@ public class EditActivity extends ActionBarActivity {
         public void handle(BaasResult<BaasDocument> doc) {
             mDialog.dismiss();
             mAddToken=null;
+
             if(doc.isSuccess()){
                 setResult(RESULT_OK);
                 finish();
             } else {
-                Toast.makeText(EditActivity.this,"ERROR SAVING DOCUMENT",Toast.LENGTH_LONG).show();
-                Log.d("ERROR","Failed with error",doc.error());
+                if (doc.error() instanceof BaasInvalidSessionException){
+                    setResult(RESULT_SESSION_EXPIRED);
+                    finish();
+                }else{
+                    setResult(RESULT_FAILED);
+                    Log.d("ERROR","Failed with error",doc.error());
+                }
             }
         }
     };
