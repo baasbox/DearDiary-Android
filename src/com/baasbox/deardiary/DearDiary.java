@@ -11,9 +11,6 @@ import java.util.List;
  */
 public class DearDiary extends Application {
 
-    //todo 1.1
-    private BaasBox box;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -22,7 +19,7 @@ public class DearDiary extends Application {
         config.authenticationType= BaasBox.Config.AuthType.SESSION_TOKEN;
         config.apiDomain = "192.168.56.1"; // the host address
         config.httpPort=9000;
-        box = BaasBox.initDefault(this,config);
+        BaasBox.initDefault(this,config);
     }
 
 }
