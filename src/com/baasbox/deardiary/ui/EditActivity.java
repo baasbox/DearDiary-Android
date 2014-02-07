@@ -24,7 +24,7 @@ public class EditActivity extends ActionBarActivity {
     private AddNoteFragment mAddNotes;
 
     //todo
-    private RequestToken mAddToken;
+
     private ProgressDialog mDialog;
 
     @Override
@@ -35,11 +35,8 @@ public class EditActivity extends ActionBarActivity {
         mDialog.setMessage("Uploading...");
         mAddNotes = (AddNoteFragment)getSupportFragmentManager().findFragmentById(R.id.Edit);
         if (savedInstanceState!=null){
-            mAddToken = RequestToken.loadAndResume(savedInstanceState,PENDING_SAVE,uploadHandler);
-            if(mAddToken!=null){
-                mDialog.show();
-            }
-        }
+            //todo 5.6 resume add
+       }
     }
 
     @Override
@@ -55,11 +52,7 @@ public class EditActivity extends ActionBarActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        if (mAddToken!=null){
-            mAddToken.suspendAndSave(outState,PENDING_SAVE);
-            mDialog.dismiss();
-        }
+    //todo resume add
     }
 
     @Override
@@ -79,28 +72,7 @@ public class EditActivity extends ActionBarActivity {
 
 
     private void saveOnBaasBox(BaasDocument document){
-         mDialog.show();
-         mAddToken=document.save(SaveMode.IGNORE_VERSION,uploadHandler);
+        //todo 5.6 save on baasbox
     }
-
-    private final BaasHandler<BaasDocument> uploadHandler = new BaasHandler<BaasDocument>() {
-        @Override
-        public void handle(BaasResult<BaasDocument> doc) {
-            mDialog.dismiss();
-            mAddToken=null;
-
-            if(doc.isSuccess()){
-                setResult(RESULT_OK);
-                finish();
-            } else {
-                if (doc.error() instanceof BaasInvalidSessionException){
-                    setResult(RESULT_SESSION_EXPIRED);
-                    finish();
-                }else{
-                    setResult(RESULT_FAILED);
-                    Log.d("ERROR","Failed with error",doc.error());
-                }
-            }
-        }
-    };
+    // todo 5.7 save handler
 }

@@ -38,9 +38,7 @@ public class LoginActivity extends FragmentActivity {
     private View mLoginStatusView;
     private TextView mLoginStatusMessageView;
 
-
-
-    private RequestToken mSignupOrLogin;
+    //todo 2.2
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +46,9 @@ public class LoginActivity extends FragmentActivity {
         setContentView(R.layout.activity_login);
 
         if (savedInstanceState!=null){
-            mSignupOrLogin = savedInstanceState.getParcelable(SIGNUP_TOKEN_KEY);
-        }
+            //todo 2.6
+
+         }
 
         mUsername = getIntent().getStringExtra(EXTRA_USERNAME);
         mUserView = (EditText) findViewById(R.id.email);
@@ -87,32 +86,24 @@ public class LoginActivity extends FragmentActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mSignupOrLogin!=null){
-            showProgress(false);
-            mSignupOrLogin.suspend();
-        }
+        //todo 2.4
+        //fixme suspend
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mSignupOrLogin!=null){
-            showProgress(true);
-            mSignupOrLogin.resume(onComplete);
-        }
+        //todo 2.5
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mSignupOrLogin!=null){
-            outState.putParcelable(SIGNUP_TOKEN_KEY,mSignupOrLogin);
-        }
+        //todo 2.7
     }
 
     private void completeLogin(boolean success){
         showProgress(false);
-        mSignupOrLogin = null;
         if (success) {
             Intent intent = new Intent(this,NoteListActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -148,7 +139,7 @@ public class LoginActivity extends FragmentActivity {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        } else if (mPassword.length() < 4) {
+        } else if (mPassword.length() ==0) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -175,29 +166,12 @@ public class LoginActivity extends FragmentActivity {
     }
 
     private void signupWithBaasBox(boolean newUser){
-        //todo 3.1
-        BaasUser user = BaasUser.withUserName(mUsername);
-        user.setPassword(mPassword);
-        if (newUser) {
-            mSignupOrLogin=user.signup(onComplete);
-        } else {
-            mSignupOrLogin=user.login(onComplete);
-        }
+        //todo 2.2
+        //fixme
     }
 
-    //todo 3.2
-    private final BaasHandler<BaasUser> onComplete =
-            new BaasHandler<BaasUser>() {
-                @Override
-                public void handle(BaasResult<BaasUser> result) {
-
-                    mSignupOrLogin = null;
-                    if (result.isFailed()){
-                        Log.d("ERROR","ERROR",result.error());
-                    }
-                    completeLogin(result.isSuccess());
-                }
-            };
+    //todo 2.3
+    //fixme add the callnback
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {

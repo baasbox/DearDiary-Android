@@ -92,12 +92,8 @@ public class AddNoteFragment extends DialogFragment {
 
 
     public BaasDocument getData() {
-        String title = mTitle.getText().toString();
-        String content  = mContent.getText().toString();
-        BaasDocument doc = new BaasDocument("memos");
-        doc.putString("title",title);
-        doc.putString("content",content);
-        return doc;
+        //todo 5.0 return the document
+        return null;
     }
 
     private void dispatchAddNote(){

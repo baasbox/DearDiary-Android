@@ -4,14 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.baasbox.android.*;
+import com.baasbox.android.BaasDocument;
+import com.baasbox.android.RequestToken;
 import com.baasbox.deardiary.R;
-
-import java.util.List;
 
 /**
  * Created by Andrea Tortorella on 24/01/14.
@@ -26,8 +24,6 @@ public class NoteListActivity extends ActionBarActivity
 
     private boolean mUseTwoPane;
     private NotesListFragment mListFragment;
-    private RequestToken mRefresh;
-    private RequestToken mSaving;
 
     private ProgressDialog mDialog;
     private boolean mDoRefresh=false;
@@ -35,24 +31,20 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //todo 2
-        if (BaasUser.current() == null){
-            startLoginScreen();
-            return;
-        }
+        //todo 2.1 check user login
+        // fixme
 
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Refreshing...");
 
         if (savedInstanceState!=null){
-            mRefresh = RequestToken.loadAndResume(savedInstanceState,REFRESH_TOKEN_KEY,onRefresh);
-            mSaving = RequestToken.loadAndResume(savedInstanceState,SAVING_TOKEN_KEY,onSave);
-            logoutToken = RequestToken.loadAndResume(savedInstanceState,LOGOUT_TOKEN_KEY,logoutHandler);
+            //todo 6 refrsh
+            //todo 5.4 save reume
+            //todo 3.4 logout resume
         }
 
-        if (mSaving!=null||mRefresh!=null||logoutToken!=null){
-            mDialog.show();
-        }
+        //todo 3.5 show the dialog
+
         mDoRefresh = savedInstanceState==null;
 
         setContentView(R.layout.activity_diary_list);
@@ -68,9 +60,6 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if(mRefresh==null&&mDoRefresh){
-            refreshDocuments();
-        }
     }
 
     @Override
@@ -85,15 +74,8 @@ public class NoteListActivity extends ActionBarActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mRefresh!=null){
-            mRefresh.suspendAndSave(outState,REFRESH_TOKEN_KEY);
-        }
-        if (mSaving!=null){
-            mSaving.suspendAndSave(outState,SAVING_TOKEN_KEY);
-        }
-        if (logoutToken!=null){
-            mSaving.suspendAndSave(outState,LOGOUT_TOKEN_KEY);
-        }
+         //todo 5.8
+        //todo 3,3 suspend token
     }
 
     private void startLoginScreen(){
@@ -124,7 +106,7 @@ public class NoteListActivity extends ActionBarActivity
             }
             return true;
         } else if (item.getItemId()==R.id.logout_action){
-            BaasUser.current().logout(logoutHandler);
+            //todo 3.1 logout
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -133,16 +115,8 @@ public class NoteListActivity extends ActionBarActivity
     private void onLogout(){
         startLoginScreen();
     }
+//todo 3.2 logout handler
 
-    private RequestToken logoutToken;
-    private final BaasHandler<Void> logoutHandler =
-            new BaasHandler<Void>() {
-                @Override
-                public void handle(BaasResult<Void> voidBaasResult) {
-                    logoutToken=null;
-                    onLogout();
-                }
-            };
     @Override
     public void onItemSelected(BaasDocument document) {
         if (mUseTwoPane) {
@@ -176,40 +150,15 @@ public class NoteListActivity extends ActionBarActivity
     }
 
     private void refreshDocuments(){
-        if(!mDialog.isShowing())mDialog.show();
-        mRefresh =BaasDocument.fetchAll("memos",onRefresh);
+        //todo 6.1
     }
 
-    private final BaasHandler<List<BaasDocument>>
-        onRefresh = new BaasHandler<List<BaasDocument>>() {
-        @Override
-        public void handle(BaasResult<List<BaasDocument>> result) {
-            mDialog.dismiss();
-            mRefresh=null;
-            try {
-                mListFragment.refresh(result.get());
-            }catch (BaasInvalidSessionException e){
-                startLoginScreen();
-            }catch (BaasException e){
-                Log.e("LOGERR","Error "+e.getMessage(),e);
-                Toast.makeText(NoteListActivity.this,"Error while talking with the box",Toast.LENGTH_LONG).show();
-            }
-        }
-    };
+    //todo 6,1
 
     @Override
     public void onAddNote(BaasDocument document) {
-        mDialog.show();
-        mSaving =document.save(SaveMode.IGNORE_VERSION,onSave);
+// todo 5.1 save
     }
 
-    private final BaasHandler<BaasDocument> onSave =
-            new BaasHandler<BaasDocument>() {
-                @Override
-                public void handle(BaasResult<BaasDocument> baasDocumentBaasResult) {
-                    mSaving=null;
-                    mDialog.dismiss();
-                    refreshDocuments();
-                }
-            };
+    //todo 5.2 saveHandler
 }

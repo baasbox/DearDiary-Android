@@ -53,6 +53,7 @@ class NotesAdapter extends BaseAdapter {
         } else {
             h = (ViewHolder)convertView.getTag();
         }
+        //todo doc
         BaasDocument document = mDocuments.get(position);
         String title = document.getString("title");
         String creationDate = document.getCreationDate();
