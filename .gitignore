@@ -3,3 +3,10 @@
 .idea
 *.iml
 .DS_Store
+.classpath
+.project
+.settings/*
+bin/**
+build/**
+gen/**
+project.properties
