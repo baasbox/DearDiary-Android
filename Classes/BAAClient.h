@@ -55,7 +55,9 @@
 - (void) deleteObject:(BAAObject *)object completion:(BAABooleanResultBlock)completionBlock;
 
 // Push notifications
+#if TARGET_OS_IPHONE
 - (void) askToEnablePushNotifications;
+#endif
 - (void) enablePushNotifications:(NSData *)token completion:(BAABooleanResultBlock)completionBlock;
 - (void) disablePushNotificationsWithCompletion:(BAABooleanResultBlock)completionBlock;
 
