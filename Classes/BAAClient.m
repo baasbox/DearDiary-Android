@@ -266,8 +266,14 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
     NSString *path = @"logout";
     
-    if (self.currentUser.pushNotificationToken) {
+    if (self.currentUser.pushNotificationToken)
+    {
         path = [NSString stringWithFormat:@"logout/%@", self.currentUser.pushNotificationToken];
+    }
+    else
+    {
+        self.currentUser = nil;
+        [self saveUserToDisk:self.currentUser];
     }
     
     [self postPath:path
@@ -676,6 +682,34 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
               
           }];
     
+}
+
+- (void)grantAccessToCollection:(NSString *)collectionName
+                       objectId:(NSString *)objectId
+                         toRole:(NSString *)roleName
+                     accessType:(NSString *)access
+                     completion:(BAAObjectResultBlock)completionBlock
+{
+    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
+                      collectionName,objectId, access, roleName];
+    
+    [[BAAClient sharedClient] putPath:path
+                           parameters:nil
+                              success:^(id responseObject)
+     {
+         
+         completionBlock(self, nil);
+         
+     }
+                              failure:^(NSError *error)
+     {
+         
+         if (completionBlock)
+         {
+             completionBlock(nil, error);
+         }
+         
+     }];
 }
 
 - (void) grantAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
@@ -1440,22 +1474,30 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 #pragma mark - Helpers
 
-- (void) saveUserToDisk:(BAAUser *)user {
-    
+- (void) saveUserToDisk:(BAAUser *)user
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
-    [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
+    
+    if (user)
+    {
+        NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
+        [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
+    }
+    else
+    {
+        [defaults removeObjectForKey:BAAUserKeyForUserDefaults];
+    }
+    
     [defaults synchronize];
     
 }
 
-- (BAAUser *) loadUserFromDisk {
-    
+- (BAAUser *) loadUserFromDisk
+{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSData *decodedUser = [defaults objectForKey:BAAUserKeyForUserDefaults];
     BAAUser *user = (BAAUser *)[NSKeyedUnarchiver unarchiveObjectWithData:decodedUser];
     return user;
-    
 }
 
 - (void) updateUserWithDictionary:(NSDictionary *) dictionary {
