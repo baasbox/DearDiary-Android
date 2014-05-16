@@ -41,6 +41,7 @@
 - (BOOL) isAuthenticated;
 
 - (void) logoutWithCompletion:(BAABooleanResultBlock)completionBlock;
+- (NSError *)lastError;
 
 // Loading
 - (void) loadObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;

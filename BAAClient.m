@@ -131,6 +131,9 @@ NSArray * BAAQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 #pragma mark - Client
 
 @interface BAAClient ()
+{
+    NSError *_lastError;
+}
 
 @property (nonatomic, copy) NSString *appCode;
 @property (nonatomic, strong) NSURLSession *session;
@@ -160,6 +163,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
     if (self = [super init]) {
         
+        _lastError = nil;
         _baseURL = [NSURL URLWithString:[BaasBox baseURL]];
         _appCode = [BaasBox appCode];
         [self _initSession];
@@ -180,6 +184,11 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                                              delegate:nil
                                         delegateQueue:[NSOperationQueue mainQueue]];
     
+}
+
+- (NSError *)lastError
+{
+    return _lastError;
 }
 
 #pragma mark - Authentication
@@ -211,13 +220,13 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                    NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                                         code:[BaasBox errorCode]
                                                     userInfo:errorDetail];
-                   completionHander(NO, error);
+                   completionHander(NO, _lastError = error);
                    
                }
                
            } failure:^(NSError *error) {
                
-               completionHander(NO, error);
+               completionHander(NO, _lastError = error);
                
            }];
     
@@ -250,13 +259,13 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                    NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                                         code:[BaasBox errorCode]
                                                     userInfo:errorDetail];
-                   completionHander(NO, error);
+                   completionHander(NO, _lastError = error);
                    
                }
                
            } failure:^(NSError *error) {
                
-               completionHander(NO, error);
+               completionHander(NO, _lastError = error);
                
            }];
     
@@ -1403,11 +1412,12 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                              NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
                                                                                         options:kNilOptions
                                                                                           error:nil];
+                             _lastError = nil;
                              success(jsonObject);
                              
                          } else {
                              
-                             failure(error);
+                             failure(_lastError = error);
                              
                          }
                          
@@ -1431,11 +1441,12 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                              NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
                                                                                         options:kNilOptions
                                                                                           error:nil];
+                             _lastError = nil;
                              success(jsonObject);
                              
                          } else {
                              
-                             failure(error);
+                             failure(_lastError = error);
                              
                          }
                          
@@ -1458,11 +1469,12 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                              NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
                                                                                         options:kNilOptions
                                                                                           error:nil];
+                             _lastError = nil;
                              success(jsonObject);
                              
                          } else {
                              
-                             failure(error);
+                             failure(_lastError = error);
                              
                          }
                          
@@ -1485,11 +1497,12 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                              NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
                                                                                         options:kNilOptions
                                                                                           error:nil];
+                             _lastError = nil;
                              success(jsonObject);
                              
                          } else {
                              
-                             failure(error);
+                             failure(_lastError = error);
                              
                          }
                          
