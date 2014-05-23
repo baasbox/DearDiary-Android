@@ -25,10 +25,9 @@
     self = [super init];
     
     if (self) {
+    
         _objectId = dictionary[@"id"];
-        _objectClass = dictionary[@"@class"];
-        _version = dictionary[@"@version"];
-        _recordId = dictionary[@"@rid"];
+        
     }
     
     return self;
@@ -97,7 +96,7 @@
     
 }
 
--(NSDictionary*) objectAsDictionary {
+- (NSDictionary*) objectAsDictionary {
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:0];
     
@@ -105,43 +104,48 @@
     
     objc_property_t *properties = class_copyPropertyList([self class], &outCount);
     
-    for(i = 0; i < outCount; i++)
-    {
+    for(i = 0; i < outCount; i++) {
+        
         objc_property_t property = properties[i];
         const char *propName = property_getName(property);
-        if(propName)
-        {
+        
+        if(propName) {
             NSString *propertyName = [NSString stringWithUTF8String:propName];
-            NSValue *value = [self valueForKey:propertyName];
+            id value = [self valueForKey:propertyName];
             
-            if ([value isKindOfClass:[NSArray class]])
-            {
-                NSArray *a = (NSArray *)value;
+            if ([value isKindOfClass:[NSArray class]]) {
+                
+                NSArray *array = (NSArray *)value;
                 NSMutableArray *tmp = [NSMutableArray array];
-                for (BAAObject *b in a)
-                {
-                    [tmp addObject:[b objectAsDictionary]];
+                for (id object in array) {
+                    
+                    if ([object respondsToSelector:@selector(objectAsDictionary)]) {
+                        
+                        [tmp addObject:[object objectAsDictionary]];
+                        
+                    } else {
+                        
+                        [tmp addObject:object];
+                        
+                    }
                     
                 }
-                [dict setValue:tmp forKey:propertyName];
-            }
-            else if ([value isKindOfClass:[NSDate class]])
-            {
-                NSDate *date = (NSDate *)value;
-                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                [formatter setDateFormat:@"yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"];
-                NSString *dateString = [formatter stringFromDate:date];
                 
-                [dict setValue:dateString forKeyPath:propertyName];
+                [dict setValue:tmp forKey:propertyName];
+                
             }
-            else if ([value isKindOfClass:[NSString class]] ||
-                     [value isKindOfClass:[NSNumber class]] ||
-                     [value isKindOfClass:[NSDictionary class]])
-            {
-                if (value && (id)value != [NSNull null])
-                {
-                    [dict setValue:value forKey:propertyName];
-                }
+            
+            else if ([value respondsToSelector:@selector(objectAsDictionary)]) {
+                
+                [dict setValue:[value objectAsDictionary]
+                        forKey:propertyName];
+                
+            }
+            
+            else if (value && (id)value != [NSNull null]) {
+                
+                [dict setValue:value forKey:propertyName];
+                
             }
         }
     }
@@ -149,6 +153,7 @@
     free(properties);
     
     return dict;
+    
 }
 
 - (NSString *)jsonString {
@@ -177,33 +182,5 @@
     return [NSString stringWithFormat:@"<%@> - %@", NSStringFromClass([self class]),  self.objectId];
     
 }
-
-- (void) grantAccessToRole:(NSString *)roleName
-                accessType:(NSString *)access
-                completion:(BAAObjectResultBlock)completionBlock
-{
-    
-    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
-                      self.collectionName,self.objectId, access, roleName];
-    
-    [[BAAClient sharedClient] putPath:path
-                           parameters:nil
-                              success:^(id responseObject)
-     {
-         
-         completionBlock(self, nil);
-         
-     }
-                              failure:^(NSError *error)
-     {
-         
-         if (completionBlock)
-         {
-             completionBlock(nil, error);
-         }
-         
-     }];
-}
-
 
 @end

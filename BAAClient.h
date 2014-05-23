@@ -41,15 +41,11 @@
 - (BOOL) isAuthenticated;
 
 - (void) logoutWithCompletion:(BAABooleanResultBlock)completionBlock;
-- (NSError *)lastError;
 
 // Loading
 - (void) loadObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object completion:(BAAArrayResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object withParams:(NSDictionary *)parameters completion:(BAAArrayResultBlock)completionBlock;
-- (void) loadDictionaryObjectsFromCollection:(NSString *)collectionName
-                                  withParams:(NSDictionary *)parameters
-                                  completion:(BAAArrayResultBlock)completionBlock;
 
 // saving
 - (void) createObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
@@ -59,9 +55,7 @@
 - (void) deleteObject:(BAAObject *)object completion:(BAABooleanResultBlock)completionBlock;
 
 // Push notifications
-#if TARGET_OS_IPHONE
 - (void) askToEnablePushNotifications;
-#endif
 - (void) enablePushNotifications:(NSData *)token completion:(BAABooleanResultBlock)completionBlock;
 - (void) disablePushNotificationsWithCompletion:(BAABooleanResultBlock)completionBlock;
 
@@ -87,15 +81,7 @@
 - (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock;
 
 // Acl
-- (void) grantAccess:(BAAFile *)file
-              toRole:(NSString *)roleName
-          accessType:(NSString *)access
-          completion:(BAAObjectResultBlock)completionBlock;
-- (void)grantAccessToCollection:(NSString *)collectionName
-                       objectId:(NSString *)objectId
-                         toRole:(NSString *)roleName
-                     accessType:(NSString *)access
-                     completion:(BAAObjectResultBlock)completionBlock;
+- (void) grantAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
 - (void) grantAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
 - (void) revokeAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
 - (void) revokeAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;

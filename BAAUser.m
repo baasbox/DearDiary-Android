@@ -30,6 +30,8 @@
 
 }
 
+@property (nonatomic, copy) NSMutableDictionary *user;
+
 @end
 
 @implementation BAAUser
@@ -41,12 +43,13 @@
     
     if (self) {
         
-        _username = dict[@"user"][@"name"];
+        _user = dict[@"user"];
         _roles = dict[@"user"][@"roles"];
-        _visibleByAnonymousUsers = dict[@"visibleByAnonymousUsers"];
-        _visibleByFriends = dict[@"visibleByFriend"];
-        _visibleByRegisteredUsers = dict[@"_visibleByRegisteredUsers"];
-        _visibleByTheUser = dict[@"_visibleByTheUser"];
+        _status = dict[@"user"][@"status"];
+        _visibleByAnonymousUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByAnonymousUsers"]];
+        _visibleByFriends = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByFriends"]];
+        _visibleByRegisteredUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByRegisteredUsers"]];
+        _visibleByTheUser = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByTheUser"]];
         
     }
     
@@ -218,8 +221,12 @@
         if (![exclude containsObject:propertyName]) {
             
             id value = [self valueForKey:propertyName];
-            if (value)
+            
+            if (value) {
+
                 [result setObject:value forKey:propertyName];
+
+            }
             
         }
         
@@ -245,8 +252,9 @@
 
 - (NSMutableDictionary *) visibleByAnonymousUsers {
     
-    if (_visibleByAnonymousUsers == nil)
+    if (_visibleByAnonymousUsers == nil) {
         _visibleByAnonymousUsers = [NSMutableDictionary dictionary];
+    }
     
     return _visibleByAnonymousUsers;
     
@@ -254,8 +262,9 @@
 
 - (NSMutableDictionary *) visibleByTheUser {
     
-    if (_visibleByTheUser == nil)
+    if (_visibleByTheUser == nil) {
         _visibleByTheUser = [NSMutableDictionary dictionary];
+    }
     
     return _visibleByTheUser;
     
@@ -263,8 +272,9 @@
 
 - (NSMutableDictionary *) visibleByFriends {
     
-    if (_visibleByFriends == nil)
+    if (_visibleByFriends == nil) {
         _visibleByFriends = [NSMutableDictionary dictionary];
+    }
     
     return _visibleByFriends;
     
@@ -272,14 +282,21 @@
 
 - (NSMutableDictionary *) visibleByRegisteredUsers {
     
-    if (_visibleByRegisteredUsers == nil)
+    if (_visibleByRegisteredUsers == nil) {
         _visibleByRegisteredUsers = [NSMutableDictionary dictionary];
+    }
     
     return _visibleByRegisteredUsers;
     
 }
 
--(NSString *)description {
+- (NSString *) username {
+    
+    return self.user[@"name"];
+    
+}
+
+- (NSString *)description {
     
     return [[self objectAsDictionary] description];
     
@@ -293,7 +310,7 @@
     
     if(self) {
         
-        decodeObject(_username);
+        decodeObject(_user);
         decodeObject(_authenticationToken);
         decodeObject(_pushNotificationToken);
         decodeBool(_pushEnabled);
@@ -306,7 +323,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     
-    encodeObject(_username);
+    encodeObject(_user);
     encodeObject(_authenticationToken);
     encodeObject(_pushNotificationToken);
     encodeBool(_pushEnabled);

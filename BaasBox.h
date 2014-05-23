@@ -15,8 +15,8 @@
 
 #import <Foundation/Foundation.h>
 
-#define BASE_URL_KEY @"http://test-visualitysw.rhcloud.com/"
-#define APP_CODE_KEY @"1234567890"
+#define BASE_URL_KEY @"baseURLKey"
+#define APP_CODE_KEY @"appCodeKey"
 
 @interface BaasBox : NSObject
 
@@ -25,5 +25,6 @@
 + (NSString *) appCode;
 + (NSString *) errorDomain;
 + (NSInteger) errorCode;
++ (NSError *)authenticationErrorForResponse:(NSDictionary *)response;
 
 @end

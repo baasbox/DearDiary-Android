@@ -19,9 +19,6 @@
 @interface BAAObject : NSObject
 
 @property (nonatomic, copy, readonly) NSString *objectId;
-@property (nonatomic, copy, readonly) NSString *recordId;
-@property (nonatomic, copy, readonly) NSString *objectClass;
-@property (nonatomic, copy, readonly) NSString *version;
 
 - (instancetype) initWithDictionary:(NSDictionary *)dictionary;
 
@@ -34,8 +31,5 @@
 - (NSString *) collectionName;
 - (NSDictionary*) objectAsDictionary;
 - (NSString *) jsonString;
-- (void) grantAccessToRole:(NSString *)roleName
-                accessType:(NSString *)access
-                completion:(BAAObjectResultBlock)completionBlock;
 
 @end
