@@ -49,8 +49,11 @@
         _visibleByAnonymousUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByAnonymousUsers"]];
         _visibleByFriends = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByFriends"]];
         _visibleByRegisteredUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByRegisteredUsers"]];
-        _visibleByTheUser = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByTheUser"]];
         
+        if ([dict[@"visibleByTheUser"] isKindOfClass:[NSDictionary class]])
+            _visibleByTheUser = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByTheUser"]];
+        else
+            _visibleByTheUser = [NSMutableDictionary dictionary];
     }
     
     return self;
