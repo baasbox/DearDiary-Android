@@ -50,7 +50,10 @@
 
 + (NSError *)authenticationErrorForResponse:(NSDictionary *)response {
 
-    NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:response[@"message"]};
+    NSDictionary *errorDetail;
+    if (response)
+        errorDetail = @{NSLocalizedDescriptionKey:response[@"message"]};
+    
     NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                          code:-22222
                                      userInfo:errorDetail];
