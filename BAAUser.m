@@ -47,13 +47,28 @@
         _roles = dict[@"user"][@"roles"];
         _status = dict[@"user"][@"status"];
         _visibleByAnonymousUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByAnonymousUsers"]];
-        _visibleByFriends = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByFriends"]];
         _visibleByRegisteredUsers = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByRegisteredUsers"]];
         
-        if ([dict[@"visibleByTheUser"] isKindOfClass:[NSDictionary class]])
-            _visibleByTheUser = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByTheUser"]];
-        else
+        if (dict[@"visibleByFriends"] == [NSNull null]) {
+            
+            _visibleByFriends = [NSMutableDictionary dictionary];
+            
+        } else {
+            
+            _visibleByFriends = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByFriends"]];
+            
+        }
+        
+        if (dict[@"visibleByTheUser"] == [NSNull null]) {
+            
             _visibleByTheUser = [NSMutableDictionary dictionary];
+            
+        } else {
+            
+            _visibleByTheUser = [NSMutableDictionary dictionaryWithDictionary:dict[@"visibleByTheUser"]];
+            
+        }
+        
     }
     
     return self;
