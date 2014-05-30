@@ -743,6 +743,33 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 }
 
+- (void)grantAccessToCollection:(NSString *)collectionName
+                       objectId:(NSString *)objectId
+                         toRole:(NSString *)roleName
+                     accessType:(NSString *)access
+                     completion:(BAAObjectResultBlock)completionBlock
+{
+    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
+                      collectionName,objectId, access, roleName];
+    
+    [[BAAClient sharedClient] putPath:path
+                           parameters:nil
+                              success:^(id responseObject)
+     {
+         
+         completionBlock(self, nil);
+         
+     }
+                              failure:^(NSError *error)
+     {
+         
+         if (completionBlock)
+         {
+             completionBlock(nil, error);
+         }
+         
+     }];
+}
 
 #pragma mark - User methods
 
