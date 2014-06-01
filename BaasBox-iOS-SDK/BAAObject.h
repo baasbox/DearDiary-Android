@@ -32,4 +32,8 @@
 - (NSDictionary*) objectAsDictionary;
 - (NSString *) jsonString;
 
+- (void)grantAccessToRole:(NSString *)roleName
+               accessType:(NSString *)access
+               completion:(void (^)(BOOL success))handler;
+
 @end
