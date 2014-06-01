@@ -1107,8 +1107,13 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 - (void) askToEnablePushNotifications {
     
+#if TARGET_OS_PHONE
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+#else
+    [[NSApplication sharedApplication] registerForRemoteNotificationTypes:
+     (NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound | NSRemoteNotificationTypeAlert)];
+#endif
     
 }
 
