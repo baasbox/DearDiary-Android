@@ -1106,8 +1106,8 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 #pragma mark - Push notifications
 
 - (void) askToEnablePushNotifications {
-    
-#if TARGET_OS_PHONE
+
+#if TARGET_OS_IPHONE
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 #else
