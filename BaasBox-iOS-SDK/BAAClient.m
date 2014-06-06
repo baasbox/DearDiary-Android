@@ -312,7 +312,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                   NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                                        code:[BaasBox errorCode]
                                                    userInfo:errorDetail];
-                  completionBlock(NO, error);
+                  completionBlock(nil, error);
                   
               }
               
@@ -991,7 +991,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
            } failure:^(NSError *error) {
                
                if (completionBlock) {
-                   completionBlock(NO, error);
+                   completionBlock(nil, error);
                }
                
            }];
