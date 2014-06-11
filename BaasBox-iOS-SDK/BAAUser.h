@@ -33,6 +33,8 @@
 - (NSString *) jsonString;
 - (NSString *) username;
 
++ (BAAUser *)userWithUsername:(NSString *)username;
+
 // load
 + (void) logoutWithCompletion:(BAABooleanResultBlock)completionBlock;
 + (void) loadCurrentUserWithCompletion:(BAAObjectResultBlock)completionBlock;
@@ -46,6 +48,8 @@
 - (void) loadFollowingWithCompletion:(BAAArrayResultBlock)completionBlock;
 - (void) loadFollowersWithCompletion:(BAAArrayResultBlock)completionBlock;
 + (void) followUser:(BAAUser *)user completion:(BAAObjectResultBlock)completionBlock;
++ (void) followUserWithUsername:(NSString *)username completion:(BAAObjectResultBlock)completionBlock;
++ (void) unfollowUserWithUsername:(NSString *)username completion:(BAABooleanResultBlock)completionBlock;
 + (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock;
 
 // Password
