@@ -130,10 +130,14 @@ NSArray * BAAQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
 #pragma mark - Client
 
+static BAAClient *sharedBAAClient = nil;
+static dispatch_once_t onceBAAToken;
+
 @interface BAAClient ()
 
 @property (nonatomic, copy) NSString *appCode;
 @property (nonatomic, strong) NSURLSession *session;
+@property (copy, nonatomic) NSString *appGroupName;
 
 - (void) saveUserToDisk:(BAAUser *)user;
 - (BAAUser *) loadUserFromDisk;
@@ -147,10 +151,17 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 + (instancetype)sharedClient {
     
-    static BAAClient *sharedBAAClient = nil;
-    static dispatch_once_t onceBAAToken;
     dispatch_once(&onceBAAToken, ^{
         sharedBAAClient = [[BAAClient alloc] init];
+    });
+    
+    return sharedBAAClient;
+}
+
++ (instancetype)sharedClientWithAppGroupName:(NSString *)appGroupName {
+    
+    dispatch_once(&onceBAAToken, ^{
+        sharedBAAClient = [[BAAClient alloc] initWithAppGroupName:appGroupName];
     });
     
     return sharedBAAClient;
@@ -163,8 +174,21 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
         _baseURL = [NSURL URLWithString:[BaasBox baseURL]];
         _appCode = [BaasBox appCode];
         [self _initSession];
-        
 	}
+    
+    return self;
+}
+
+- (id) initWithAppGroupName:(NSString *)appGroupName {
+    
+    if (self = [super init]) {
+        
+        _baseURL = [NSURL URLWithString:[BaasBox baseURL]];
+        _appCode = [BaasBox appCode];
+        _appGroupName = appGroupName;
+        
+        [self _initSession];
+    }
     
     return self;
 }
@@ -1108,8 +1132,10 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 - (void) askToEnablePushNotifications {
 
 #if TARGET_OS_IPHONE
+#ifdef UIKIT_EXTERN
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+#endif
 #else
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:
      (NSRemoteNotificationTypeBadge | NSRemoteNotificationTypeSound | NSRemoteNotificationTypeAlert)];
@@ -1551,6 +1577,10 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 - (void) saveUserToDisk:(BAAUser *)user {
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName)
+        defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+
     NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
     [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
     [defaults synchronize];
@@ -1560,8 +1590,16 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 - (BAAUser *) loadUserFromDisk {
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName)
+        defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+    
     NSData *decodedUser = [defaults objectForKey:BAAUserKeyForUserDefaults];
     BAAUser *user = (BAAUser *)[NSKeyedUnarchiver unarchiveObjectWithData:decodedUser];
+    
+    NSLog(@"User: %@",user);
+    NSLog(@"Token: %@",user.authenticationToken);
+    
     return user;
     
 }
