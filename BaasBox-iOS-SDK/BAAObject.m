@@ -87,16 +87,38 @@
     
     [client deleteObject:self
               completion:completionBlock];
+}
+
+- (void)grantAccessToRole:(NSString *)roleName
+               accessType:(NSString *)access
+               completion:(void (^)(BOOL success))handler
+{
+    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
+                      self.collectionName,self.objectId, access, roleName];
     
+    [[BAAClient sharedClient] putPath:path
+                           parameters:nil
+                              success:^(id responseObject)
+     {
+         if (handler)
+             handler(YES);
+     }
+                              failure:^(NSError *error)
+     {
+         if (handler)
+             handler(NO);
+     }];
 }
 
 - (NSString *) collectionName {
     
-    return @"OVERWRITE THIS METHOD";
-    
+    return @"OVERRIDE THIS METHOD";
 }
 
 - (NSDictionary*) objectAsDictionary {
+    
+    if ([self respondsToSelector:@selector(dictionaryRepresentation)])
+        return [self performSelector:@selector(dictionaryRepresentation)];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:0];
     

@@ -36,7 +36,6 @@
 
 @implementation BAAUser
 
-
 - (instancetype) initWithDictionary:(NSDictionary *)dict {
 
     self = [super init];
@@ -73,6 +72,12 @@
     
     return self;
     
+}
+
++ (BAAUser *)userWithUsername:(NSString *)username
+{
+    BAAUser *user = [[BAAUser alloc] initWithDictionary:@{@"user":@{@"name":username}}];
+    return user;
 }
 
 #pragma mark - Load
@@ -177,6 +182,11 @@
 
 #pragma mark - Follow/Unfollow
 
++ (void) followUserWithUsername:(NSString *)username completion:(BAAObjectResultBlock)completionBlock {
+    BAAUser *user = [BAAUser userWithUsername:username];
+    [self followUser:user completion:completionBlock];
+}
+
 + (void) followUser:(BAAUser *)user completion:(BAAObjectResultBlock)completionBlock {
 
     BAAClient *client = [BAAClient sharedClient];
@@ -188,6 +198,12 @@
                 
             }];
     
+}
+
++ (void) unfollowUserWithUsername:(NSString *)username completion:(BAABooleanResultBlock)completionBlock {
+
+    BAAUser *user = [BAAUser userWithUsername:username];
+    [self unfollowUser:user completion:completionBlock];
 }
 
 + (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock {

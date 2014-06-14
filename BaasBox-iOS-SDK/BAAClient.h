@@ -28,6 +28,7 @@
 @property (nonatomic, strong, readonly) NSURL *baseURL;
 
 + (instancetype)sharedClient;
++ (instancetype)sharedClientWithAppGroupName:(NSString *)appGroupName;
 
 // Authentication
 - (void)authenticateUser:(NSString *)username
