@@ -28,7 +28,6 @@
 @property (nonatomic, strong, readonly) NSURL *baseURL;
 
 + (instancetype)sharedClient;
-+ (instancetype)sharedClientWithAppGroupName:(NSString *)appGroupName;
 
 // Authentication
 - (void)authenticateUser:(NSString *)username
@@ -47,9 +46,6 @@
 - (void) loadObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object completion:(BAAArrayResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object withParams:(NSDictionary *)parameters completion:(BAAArrayResultBlock)completionBlock;
-- (void)loadDictionaryObjectsFromCollection:(NSString *)collectionName
-                                 withParams:(NSDictionary *)parameters
-                                 completion:(BAAArrayResultBlock)completionBlock;
 
 // saving
 - (void) createObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
@@ -57,6 +53,9 @@
 
 // Deleting
 - (void) deleteObject:(BAAObject *)object completion:(BAABooleanResultBlock)completionBlock;
+
+// Counting
+- (void) fetchCountForObjects:(BAAObject *)object completion:(BAAIntegerResultBlock)completionBlock;
 
 // Push notifications
 - (void) askToEnablePushNotifications;
@@ -85,15 +84,10 @@
 - (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock;
 
 // Acl
-- (void) grantAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) grantAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) revokeAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) revokeAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void)grantAccessToCollection:(NSString *)collectionName
-                       objectId:(NSString *)objectId
-                         toRole:(NSString *)roleName
-                     accessType:(NSString *)access
-                     completion:(BAAObjectResultBlock)completionBlock;
+- (void) grantAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) grantAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) revokeAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) revokeAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
 
 // Password
 - (void) changeOldPassword:(NSString *)oldPassword toNewPassword:(NSString *)newPassword completion:(BAABooleanResultBlock)completionBlock;
@@ -104,6 +98,7 @@
 - (void) loadSettingsWithCompletion:(BAAObjectResultBlock)completionBlock;
 - (void) loadSettingsSection:(NSString *)sectionName completion:(BAAObjectResultBlock)completionBlock;
 - (void) setValue:(NSString *)value forKey:(NSString *)key inSection:(NSString *)sectionName completion:(BAAObjectResultBlock)completionBlock;
+
 
 // Core methods
 - (void)getPath:(NSString *)path
@@ -141,7 +136,7 @@ extern NSString * const kAclAdministratorRole;
 extern NSString * const kAclReadPermission;
 extern NSString * const kAclDeletePermission;
 extern NSString * const kAclUpdatePermission;
-
+extern NSString * const kAclAllPermission;
 
 
 

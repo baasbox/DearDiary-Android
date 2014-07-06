@@ -18,6 +18,12 @@
 #import "BaasBox.h"
 #import <objc/runtime.h>
 
+@interface BAAObject ()
+
+@property (nonatomic, strong) BAAClient *client;
+
+@end
+
 @implementation BAAObject
 
 - (instancetype) initWithDictionary:(NSDictionary *)dictionary {
@@ -27,10 +33,21 @@
     if (self) {
     
         _objectId = dictionary[@"id"];
-        
+        _version = [dictionary[@"@version"] intValue];
+        _creationDate = [[BaasBox dateFormatter] dateFromString:dictionary[@"_creation_date"]];
+
     }
     
     return self;
+    
+}
+
+- (BAAClient *) client {
+    
+    if (_client == nil)
+        _client = [BAAClient sharedClient];
+    
+    return _client;
     
 }
 
@@ -110,10 +127,61 @@
      }];
 }
 
+#pragma mark - ACL
+
+- (void) grantAccessToRole:(NSString *)roleName ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock {
+    
+    [self.client grantAccess:self
+                      toRole:roleName
+                  accessType:accessType
+                  completion:completionBlock];
+    
+}
+
+- (void) grantAccessToUser:(NSString *)username ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock {
+    
+    [self.client grantAccess:self
+                      toUser:username
+                  accessType:accessType
+                  completion:completionBlock];
+    
+}
+
+- (void) revokeAccessToRole:(NSString *)roleName ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock {
+    
+    [self.client revokeAccess:self
+                       toRole:roleName
+                   accessType:accessType
+                   completion:completionBlock];
+    
+}
+
+- (void) revokeAccessToUser:(NSString *)username ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock {
+    
+    [self.client revokeAccess:self
+                       toUser:username
+                   accessType:accessType
+                   completion:completionBlock];
+    
+}
+
+
 - (NSString *) collectionName {
     
     return @"OVERRIDE THIS METHOD";
 }
+
+#pragma mark - Counter methods
+
++ (void) fetchCountForObjectsWithCompletion:(BAAIntegerResultBlock)completionBlock {
+
+    BAAClient *client = [BAAClient sharedClient];
+    [client fetchCountForObjects:[[self alloc] init]
+                completion:completionBlock];
+    
+}
+
+#pragma mark - Helper methods
 
 - (NSDictionary*) objectAsDictionary {
     
@@ -202,6 +270,55 @@
 -(NSString *)description {
 
     return [NSString stringWithFormat:@"<%@> - %@", NSStringFromClass([self class]),  self.objectId];
+    
+}
+
+#pragma mark - Experimental
+
+// Random selection should be done on the server side. This is a patch.
+// I tested it but might not always work.
+
++ (void) getRandomObjectsWithParams:(NSDictionary *)parameters bound:(NSInteger)bound completion:(BAAArrayResultBlock)completionBlock {
+    
+    [[self class] getObjectsWithParams:parameters completion:^(NSArray *objects, NSError *error) {
+        
+        if (error == nil) {
+            
+            if (completionBlock) {
+                
+                if (bound > objects.count) {
+                    
+                    completionBlock(@[],  nil);
+                    
+                } else {
+                    
+                    NSMutableSet *randomDistinctObjects = [NSMutableSet setWithCapacity:bound];
+                    
+                    do {
+                        
+                        NSInteger randomIndex = arc4random_uniform((u_int32_t)objects.count);
+                        [randomDistinctObjects addObject:objects[randomIndex]];
+                        
+                    } while (randomDistinctObjects.count < bound);
+                    
+                    NSArray *result = [randomDistinctObjects allObjects];
+                    
+                    completionBlock(result, nil);
+                    
+                }
+                
+            }
+            
+        } else {
+            
+            if (completionBlock) {
+                
+                completionBlock(nil, error);
+                
+            }
+        }
+        
+    }];
     
 }
 

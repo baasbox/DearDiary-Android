@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-#define VERSION @"0.8"
+#define VERSION @"0.8.1"
 
 #import "BAAClient.h"
 #import "BaasBox.h"
@@ -30,6 +30,7 @@ NSString * const kAclAdministratorRole = @"administrator";
 NSString * const kAclReadPermission = @"read";
 NSString * const kAclDeletePermission = @"delete";
 NSString * const kAclUpdatePermission = @"update";
+NSString * const kAclAllPermission = @"all";
 
 static NSString * const boundary = @"BAASBOX_BOUNDARY_STRING";
 
@@ -425,7 +426,6 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                
                completionBlock(nil, error);
                
-               
            }];
     
 }
@@ -466,6 +466,28 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                  
                  
              }];
+    
+}
+
+- (void) fetchCountForObjects:(BAAObject *)object completion:(BAAIntegerResultBlock)completionBlock {
+    
+    [self getPath:[NSString stringWithFormat:@"%@/count", object.collectionName]
+       parameters:nil
+          success:^(id responseObject) {
+              
+              NSInteger result = [responseObject[@"data"][@"count"] intValue];
+              
+              if (completionBlock) {
+                  completionBlock(result, nil);
+              }
+              
+          } failure:^(NSError *error) {
+              
+              if (completionBlock) {
+                  completionBlock(-1, error);
+              }
+              
+          }];
     
 }
 
@@ -705,36 +727,16 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 #pragma mark - Acl
 
-- (void) grantAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
+- (void) grantAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
     
-    NSString *path = [NSString stringWithFormat:@"file/%@/%@/role/%@", file.fileId, access, roleName];
-    
-    [self putPath:path
-       parameters:nil
-          success:^(id responseObject) {
-              
-              completionBlock(file, nil);
-              
-          } failure:^(NSError *error) {
-              
-              if (completionBlock) {
-                  completionBlock(nil, error);
-              }
-              
-          }];
-    
-}
-
-- (void) grantAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
-    
-    NSString *path = [NSString stringWithFormat:@"file/%@/%@/user/%@", file.fileId, access, username];
+    NSString *path = [self buildPathForRoleACL:element forAccessType:access roleName:roleName];
     
     [self putPath:path
        parameters:nil
           success:^(id responseObject) {
               
               if (completionBlock) {
-                  completionBlock(file, nil);
+                  completionBlock(element, nil);
               }
               
           } failure:^(NSError *error) {
@@ -747,16 +749,38 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 }
 
-- (void) revokeAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
+- (void) grantAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
     
-    NSString *path = [NSString stringWithFormat:@"file/%@/%@/role/%@", file.fileId, access, roleName];
+    NSString *path = [self buildPathForUserACL:element forAccessType:access username:username];
+    
+    [self putPath:path
+       parameters:nil
+          success:^(id responseObject) {
+              
+              if (completionBlock) {
+                  completionBlock(element, nil);
+              }
+              
+          } failure:^(NSError *error) {
+              
+              if (completionBlock) {
+                  completionBlock(nil, error);
+              }
+              
+          }];
+    
+}
+
+- (void) revokeAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
+    
+    NSString *path = [self buildPathForRoleACL:element forAccessType:access roleName:roleName];
     
     [self deletePath:path
           parameters:nil
              success:^(id responseObject) {
                  
                  if (completionBlock) {
-                     completionBlock(file, nil);
+                     completionBlock(element, nil);
                  }
                  
              } failure:^(NSError *error) {
@@ -769,16 +793,16 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 }
 
-- (void) revokeAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
+- (void) revokeAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock {
     
-    NSString *path = [NSString stringWithFormat:@"file/%@/%@/user/%@", file.fileId, access, username];
+    NSString *path = [self buildPathForUserACL:element forAccessType:access username:username];
     
     [self deletePath:path
           parameters:nil
              success:^(id responseObject) {
                  
                  if (completionBlock) {
-                     completionBlock(file, nil);
+                     completionBlock(element, nil);
                  }
                  
              } failure:^(NSError *error) {
@@ -818,6 +842,48 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
          
      }];
 }
+
+// Both methods are ugly, but at the moment let's live with these
+- (NSString *) buildPathForRoleACL:(id)element forAccessType:(NSString *)accessType roleName:(NSString *)role {
+
+    NSString *path;
+    
+    if ([element isKindOfClass:[BAAFile class]]) {
+    
+        BAAFile *file = (BAAFile *)element;
+        path = [NSString stringWithFormat:@"file/%@/%@/role/%@", file.fileId, accessType, role];
+        
+    } else {
+    
+        BAAObject *object = (BAAObject *)element;
+        path = [NSString stringWithFormat:@"%@/%@/%@/role/%@", object.collectionName, object.objectId, accessType, role];
+        
+    }
+    
+    return path;
+    
+}
+
+- (NSString *) buildPathForUserACL:(id)element forAccessType:(NSString *)accessType username:(NSString *)name {
+    
+    NSString *path;
+    
+    if ([element isKindOfClass:[BAAFile class]]) {
+        
+        BAAFile *file = (BAAFile *)element;
+        path = [NSString stringWithFormat:@"file/%@/%@/user/%@", file.fileId, accessType, name];
+        
+    } else {
+        
+        BAAObject *object = (BAAObject *)element;
+        path = [NSString stringWithFormat:@"%@/%@/%@/user/%@", object.collectionName, object.objectId, accessType, name];
+        
+    }
+    
+    return path;
+    
+}
+
 
 #pragma mark - User methods
 
