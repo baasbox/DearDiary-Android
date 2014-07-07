@@ -1015,7 +1015,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
            } failure:^(NSError *error) {
                
                if (completionBlock) {
-                   completionBlock(NO, error);
+                   completionBlock(nil, error);
                }
                
            }];
