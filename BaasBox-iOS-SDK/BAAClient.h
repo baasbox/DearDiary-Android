@@ -28,6 +28,7 @@
 @property (nonatomic, strong, readonly) NSURL *baseURL;
 
 + (instancetype)sharedClient;
++ (instancetype)sharedClientWithAppGroupName:(NSString *)appGroupName;
 
 // Authentication
 - (void)authenticateUser:(NSString *)username
@@ -46,6 +47,9 @@
 - (void) loadObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object completion:(BAAArrayResultBlock)completionBlock;
 - (void) loadCollection:(BAAObject *)object withParams:(NSDictionary *)parameters completion:(BAAArrayResultBlock)completionBlock;
+- (void)loadDictionaryObjectsFromCollection:(NSString *)collectionName
+                                 withParams:(NSDictionary *)parameters
+                                 completion:(BAAArrayResultBlock)completionBlock;
 
 // saving
 - (void) createObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock;
@@ -84,10 +88,15 @@
 - (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock;
 
 // Acl
-- (void) grantAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) grantAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) revokeAccess:(id)element toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
-- (void) revokeAccess:(id)element toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) grantAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) grantAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) revokeAccess:(BAAFile *)file toRole:(NSString *)roleName accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void) revokeAccess:(BAAFile *)file toUser:(NSString *)username accessType:(NSString *)access completion:(BAAObjectResultBlock)completionBlock;
+- (void)grantAccessToCollection:(NSString *)collectionName
+                       objectId:(NSString *)objectId
+                         toRole:(NSString *)roleName
+                     accessType:(NSString *)access
+                     completion:(BAAObjectResultBlock)completionBlock;
 
 // Password
 - (void) changeOldPassword:(NSString *)oldPassword toNewPassword:(NSString *)newPassword completion:(BAABooleanResultBlock)completionBlock;
@@ -121,6 +130,7 @@
            success:(void (^)(id responseObject))success
            failure:(void (^)(NSError *error))failure;
 
+- (void) saveUserToDisk:(BAAUser *)user;
 
 // Pagination constants
 extern NSString * const kPageNumberKey;

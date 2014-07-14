@@ -164,10 +164,149 @@
     [client loadFollowersOfUser:self
                       completion:^(NSArray *users, NSError *error) {
                           
-                          if (completionBlock)
+                          if (completionBlock) {
                               completionBlock(users, error);
+                          }
                           
                       }];
+    
+}
+
+#pragma mark - Social
+
++ (void) loginWithFacebookToken:(NSString *)token completion:(BAABooleanResultBlock)completionBlock {
+    
+    BAAClient *client = [BAAClient sharedClient];
+    [client postPath:@"/social/facebook"
+          parameters:@{@"oauth_token":token, @"oauth_secret":token}
+             success:^(id responseObject) {
+                 
+                 BAAUser *user = [[BAAUser alloc] initWithDictionary:responseObject[@"data"]];
+                 user.authenticationToken = responseObject[@"data"][@"X-BB-SESSION"];
+                 client.currentUser = user;
+                 [client saveUserToDisk:user];
+                 if (completionBlock) {
+                     completionBlock(YES, nil);
+                 }
+                 
+             } failure:^(NSError *error) {
+                 
+                 if (completionBlock) {
+                     completionBlock(NO, error);
+                 }
+                 
+             }];
+    
+}
+
+- (void) linkToFacebookWithToken:(NSString *)token completion:(BAABooleanResultBlock)completionBlock {
+    
+    BAAClient *client = [BAAClient sharedClient];
+    [client putPath:@"/social/facebook"
+         parameters:@{@"oauth_token":token, @"oauth_secret":token}
+            success:^(id responseObject) {
+                if (completionBlock) {
+                    completionBlock(YES, nil);
+                }
+            } failure:^(NSError *error) {
+                if (completionBlock) {
+                    completionBlock(NO, error);
+                }
+            }];
+
+}
+
+- (void) unlinkFromFacebookWithCompletion:(BAABooleanResultBlock)completionBlock {
+
+    BAAClient *client = [BAAClient sharedClient];
+    [client deletePath:@"/social/facebook"
+            parameters:nil
+               success:^(id responseObject) {
+                   if (completionBlock) {
+                       completionBlock(YES, nil);
+                   }
+               } failure:^(NSError *error) {
+                   if (completionBlock) {
+                       completionBlock(NO, error);
+                   }
+               }];
+    
+}
+
++ (void) loginWithGoogleToken:(NSString *)token completion:(BAABooleanResultBlock)completionBlock {
+
+    BAAClient *client = [BAAClient sharedClient];
+    [client postPath:@"/social/google"
+          parameters:@{@"oauth_token":token, @"oauth_secret":token}
+             success:^(id responseObject) {
+                 
+                 BAAUser *user = [[BAAUser alloc] initWithDictionary:responseObject[@"data"]];
+                 user.authenticationToken = responseObject[@"data"][@"X-BB-SESSION"];
+                 client.currentUser = user;
+                 [client saveUserToDisk:user];
+                 if (completionBlock) {
+                     completionBlock(YES, nil);
+                 }
+                 
+             } failure:^(NSError *error) {
+                 
+                 if (completionBlock) {
+                     completionBlock(NO, error);
+                 }
+                 
+             }];
+    
+}
+
+- (void) linkToGoogleWithToken:(NSString *)token completion:(BAABooleanResultBlock)completionBlock {
+    
+    BAAClient *client = [BAAClient sharedClient];
+    [client putPath:@"/social/google"
+         parameters:@{@"oauth_token":token, @"oauth_secret":token}
+            success:^(id responseObject) {
+                if (completionBlock) {
+                    completionBlock(YES, nil);
+                }
+            } failure:^(NSError *error) {
+                if (completionBlock) {
+                    completionBlock(NO, error);
+                }
+            }];
+    
+}
+
+- (void) unlinkFromGoogleWithCompletion:(BAABooleanResultBlock)completionBlock {
+
+    BAAClient *client = [BAAClient sharedClient];
+    [client deletePath:@"/social/google"
+            parameters:nil
+               success:^(id responseObject) {
+                   if (completionBlock) {
+                       completionBlock(YES, nil);
+                   }
+               } failure:^(NSError *error) {
+                   if (completionBlock) {
+                       completionBlock(NO, error);
+                   }
+               }];
+    
+}
+
+- (void) fetchLinkedSocialNetworksWithCompletion:(BAAArrayResultBlock)completionBlock {
+    
+    BAAClient *client = [BAAClient sharedClient];
+    [client getPath:@"/social"
+         parameters:nil
+            success:^(id responseObject) {
+                if (completionBlock) {
+                    NSArray *res = responseObject[@"data"];
+                    completionBlock(res, nil);
+                }
+            } failure:^(NSError *error) {
+                if(completionBlock) {
+                    completionBlock(nil, error);
+                }
+            }];
     
 }
 

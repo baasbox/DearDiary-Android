@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-#define VERSION @"0.8.1"
+#define VERSION @"0.8.2"
 
 #import "BAAClient.h"
 #import "BaasBox.h"
@@ -140,7 +140,6 @@ static dispatch_once_t onceBAAToken;
 @property (nonatomic, strong) NSURLSession *session;
 @property (copy, nonatomic) NSString *appGroupName;
 
-- (void) saveUserToDisk:(BAAUser *)user;
 - (BAAUser *) loadUserFromDisk;
 - (void)_initSession;
 
