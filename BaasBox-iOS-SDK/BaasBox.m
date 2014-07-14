@@ -50,11 +50,24 @@
 
 + (NSError *)authenticationErrorForResponse:(NSDictionary *)response {
 
-    NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:response[@"message"]};
+    NSDictionary *errorDetail = response ? @{NSLocalizedDescriptionKey:response[@"message"]} : nil;
     NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                          code:-22222
                                      userInfo:errorDetail];
     return error;
+    
+}
+
++ (NSDateFormatter *)dateFormatter {
+    
+    static NSDateFormatter *_dateFormatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _dateFormatter = [[NSDateFormatter alloc] init];
+        [_dateFormatter setDateFormat:@"yyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"];
+    });
+    
+    return _dateFormatter;
     
 }
 

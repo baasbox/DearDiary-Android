@@ -58,6 +58,9 @@
 // Deleting
 - (void) deleteObject:(BAAObject *)object completion:(BAABooleanResultBlock)completionBlock;
 
+// Counting
+- (void) fetchCountForObjects:(BAAObject *)object completion:(BAAIntegerResultBlock)completionBlock;
+
 // Push notifications
 - (void) askToEnablePushNotifications;
 - (void) enablePushNotifications:(NSData *)token completion:(BAABooleanResultBlock)completionBlock;
@@ -105,6 +108,7 @@
 - (void) loadSettingsSection:(NSString *)sectionName completion:(BAAObjectResultBlock)completionBlock;
 - (void) setValue:(NSString *)value forKey:(NSString *)key inSection:(NSString *)sectionName completion:(BAAObjectResultBlock)completionBlock;
 
+
 // Core methods
 - (void)getPath:(NSString *)path
      parameters:(NSDictionary *)parameters
@@ -126,6 +130,7 @@
            success:(void (^)(id responseObject))success
            failure:(void (^)(NSError *error))failure;
 
+- (void) saveUserToDisk:(BAAUser *)user;
 
 // Pagination constants
 extern NSString * const kPageNumberKey;
@@ -141,7 +146,7 @@ extern NSString * const kAclAdministratorRole;
 extern NSString * const kAclReadPermission;
 extern NSString * const kAclDeletePermission;
 extern NSString * const kAclUpdatePermission;
-
+extern NSString * const kAclAllPermission;
 
 
 
