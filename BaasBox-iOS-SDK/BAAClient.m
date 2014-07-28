@@ -200,6 +200,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     NSDictionary *headers = @{@"Accept": @"application/json",
                               @"User-Agent": [NSString stringWithFormat:@"BaasBox iOS SDK %@", VERSION]};
     sessionConfiguration.HTTPAdditionalHeaders = headers;
+    
     _session = [NSURLSession sessionWithConfiguration:sessionConfiguration
                                              delegate:nil
                                         delegateQueue:[NSOperationQueue mainQueue]];
@@ -1482,42 +1483,54 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 	BAAMutableURLRequest *request = [self requestWithMethod:@"GET" URLString:path parameters:parameters];
     
-    [[self.session dataTaskWithRequest:request
-                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                         
-                         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
-                         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
-                                                                                    options:kNilOptions
-                                                                                      error:nil];
-                         
-                         if (httpResponse.statusCode >= 400) {
-                             
-                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];                            
-                             failure(error);
-                             return;
-                             
-                         }
-                         
-                         if (error == nil) {
-                             
-                             NSString *contentType = [httpResponse.allHeaderFields objectForKey:@"Content-type"];
-                             if ([contentType hasPrefix:@"image/"]) {
-                                 
-                                 success(data);
-                                 
-                             } else {
-                             
-                                 success(jsonObject);
-                                 
-                             }
-                             
-                         } else {
-                         
-                             failure(error);
-                     
-                         }
-      
-      }] resume];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+                   {
+                       [[self.session dataTaskWithRequest:request
+                                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                            
+                                            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+                                            NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                       options:kNilOptions
+                                                                                                         error:nil];
+                                            
+                                            if (httpResponse.statusCode >= 400) {
+                                                
+                                                NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                return;
+                                                
+                                            }
+                                            
+                                            if (error == nil) {
+                                                
+                                                NSString *contentType = [httpResponse.allHeaderFields objectForKey:@"Content-type"];
+                                                if ([contentType hasPrefix:@"image/"]) {
+                                                    
+                                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                                        success(data);
+                                                    });
+                                                    
+                                                } else {
+                                                    
+                                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                                        success(jsonObject);
+                                                    });
+                                                    
+                                                }
+                                                
+                                            } else {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                
+                                            }
+                                            
+                                        }] resume];
+                   });
     
 }
 
@@ -1530,33 +1543,41 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                                                   URLString:path
                                                  parameters:parameters];
     
-	[[self.session dataTaskWithRequest:request
-                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                         
-                         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
-                         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
-                                                                                    options:kNilOptions
-                                                                                      error:nil];
-                         
-                         if (r.statusCode >= 400) {
-                             
-                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
-                             failure(error);
-                             return;
-                             
-                         }
-                         
-                         if (error == nil) {
-
-                             success(jsonObject);
-                             
-                         } else {
-                             
-                             failure(error);
-                             
-                         }
-                         
-                     }] resume];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+                   {
+                       [[self.session dataTaskWithRequest:request
+                                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                            
+                                            NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
+                                            NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                       options:kNilOptions
+                                                                                                         error:nil];
+                                            
+                                            if (r.statusCode >= 400) {
+                                                
+                                                NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                return;
+                                                
+                                            }
+                                            
+                                            if (error == nil) {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    success(jsonObject);
+                                                });
+                                            } else {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                
+                                            }
+                                            
+                                        }] resume];
+                   });
     
 }
 
@@ -1568,33 +1589,41 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     BAAMutableURLRequest *request = [self requestWithMethod:@"PUT"
                                                   URLString:path
                                                  parameters:parameters];
-    [[self.session dataTaskWithRequest:request
-                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                         
-                         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
-                         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
-                                                                                    options:kNilOptions
-                                                                                      error:nil];
-                         
-                         if (r.statusCode >= 400) {
-                             
-                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
-                             failure(error);
-                             return;
-                             
-                         }
-                         
-                         if (error == nil) {
-
-                             success(jsonObject);
-                             
-                         } else {
-                             
-                             failure(error);
-                             
-                         }
-                         
-                     }] resume];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+                   {
+                       [[self.session dataTaskWithRequest:request
+                                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                            
+                                            NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
+                                            NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                       options:kNilOptions
+                                                                                                         error:nil];
+                                            
+                                            if (r.statusCode >= 400) {
+                                                
+                                                NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                return;
+                                                
+                                            }
+                                            
+                                            if (error == nil) {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    success(jsonObject);
+                                                });
+                                            } else {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                
+                                            }
+                                            
+                                        }] resume];
+                   });
     
 }
 
@@ -1606,34 +1635,40 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     BAAMutableURLRequest *request = [self requestWithMethod:@"DELETE"
                                                   URLString:path
                                                  parameters:parameters];
-    [[self.session dataTaskWithRequest:request
-                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-                         
-                         NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
-                         NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
-                                                                                    options:kNilOptions
-                                                                                      error:nil];
-                         
-                         if (r.statusCode >= 400) {
-                             
-                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
-                             failure(error);
-                             return;
-                             
-                         }
-                         
-                         if (error == nil) {
-
-                             success(jsonObject);
-                             
-                         } else {
-                             
-                             failure(error);
-                             
-                         }
-                         
-                     }] resume];
-    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+                   {
+                       [[self.session dataTaskWithRequest:request
+                                        completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                            
+                                            NSHTTPURLResponse *r = (NSHTTPURLResponse*)response;
+                                            NSDictionary *jsonObject = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                       options:kNilOptions
+                                                                                                         error:nil];
+                                            
+                                            if (r.statusCode >= 400) {
+                                                
+                                                NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                                return;
+                                                
+                                            }
+                                            
+                                            if (error == nil) {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    success(jsonObject);
+                                                });
+                                            } else {
+                                                
+                                                dispatch_async(dispatch_get_main_queue(), ^{
+                                                    failure(error);
+                                                });
+                                            }
+                                            
+                                        }] resume];
+                   });
 }
 
 
