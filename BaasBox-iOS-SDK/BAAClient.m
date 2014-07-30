@@ -306,9 +306,11 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                
            } failure:^(NSError *error) {
                
-               if (completionHander)
+               if (completionHander) {
+                   self.currentUser = nil;
+                   [self saveUserToDisk:self.currentUser];
                    completionHander(NO, error);
-               
+               }
            }];
     
 }
@@ -1678,13 +1680,18 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName)
-        defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+    if (user) {
 
-    NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
-    [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
-    [defaults synchronize];
-    
+        if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName)
+            defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+        
+        NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
+        [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
+        [defaults synchronize];
+    } else {
+        [defaults removeObjectForKey:BAAUserKeyForUserDefaults];
+        [defaults synchronize];
+    }
 }
 
 - (BAAUser *) loadUserFromDisk {
@@ -1738,7 +1745,6 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 - (BOOL) isAuthenticated {
     
     return self.currentUser.authenticationToken != nil;
-    
 }
 
 @end
