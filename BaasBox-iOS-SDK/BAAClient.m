@@ -294,21 +294,20 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
         path = [NSString stringWithFormat:@"logout/%@", self.currentUser.pushNotificationToken];
     }
     
+    self.currentUser = nil;
+    [self saveUserToDisk:self.currentUser];
+
     [self postPath:path
         parameters:nil
            success:^(id responseObject) {
                
                if (completionHander) {
-                   self.currentUser = nil;
-                   [self saveUserToDisk:self.currentUser];
                    completionHander(YES, nil);
                }
                
            } failure:^(NSError *error) {
-               
+
                if (completionHander) {
-                   self.currentUser = nil;
-                   [self saveUserToDisk:self.currentUser];
                    completionHander(NO, error);
                }
            }];
