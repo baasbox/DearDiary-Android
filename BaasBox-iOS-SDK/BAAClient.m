@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-#define VERSION @"0.8.2"
-
 #import "BAAClient.h"
 #import "BaasBox.h"
 #import "BAAMutableURLRequest.h"
@@ -251,8 +249,33 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                       password:(NSString *)password
                     completion:(BAABooleanResultBlock)completionHander {
     
+    [self createUserWithUsername:username
+                        password:password
+                visibleByTheUser:nil
+                visibleByFriends:nil
+        visibleByRegisteredUsers:nil
+         visibleByAnonymousUsers:nil
+                      completion:completionHander];
+    
+}
+
+- (void)createUserWithUsername:(NSString *)username
+                      password:(NSString *)password
+              visibleByTheUser:(NSDictionary *)visibleByTheUser
+              visibleByFriends:(NSDictionary *)visibleByFriends
+      visibleByRegisteredUsers:(NSDictionary *)visibleByRegisteredUsers
+       visibleByAnonymousUsers:(NSDictionary *)visibleByAnonymousUsers
+                    completion:(BAABooleanResultBlock)completionHander {
+    
     [self postPath:@"user"
-        parameters:@{@"username" : username, @"password": password, @"appcode" : self.appCode}
+        parameters:@{
+                     @"username" : username,
+                     @"password": password,
+                     @"appcode" : self.appCode,
+                     @"visibleByTheUser" : visibleByTheUser ?: @{},
+                     @"visibleByFriends" : visibleByFriends ?: @{},
+                     @"visibleByRegisteredUsers" : visibleByRegisteredUsers ?: @{},
+                     @"visibleByAnonymousUsers" : visibleByAnonymousUsers ?: @{}}
            success:^(NSDictionary *responseObject) {
                
                NSString *token = responseObject[@"data"][@"X-BB-SESSION"];
@@ -1702,13 +1725,17 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
         defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
     
     NSData *decodedUser = [defaults objectForKey:BAAUserKeyForUserDefaults];
-    BAAUser *user = (BAAUser *)[NSKeyedUnarchiver unarchiveObjectWithData:decodedUser];
     
-    NSLog(@"User: %@",user);
-    NSLog(@"Token: %@",user.authenticationToken);
-    
-    return user;
-    
+    if (decodedUser) {
+
+      BAAUser *user = (BAAUser *)[NSKeyedUnarchiver unarchiveObjectWithData:decodedUser];
+      return user;
+
+    } else {
+
+      return nil;
+      
+    }
 }
 
 - (void) updateUserWithDictionary:(NSDictionary *)dictionary {
