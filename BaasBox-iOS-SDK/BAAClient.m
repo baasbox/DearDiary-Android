@@ -413,24 +413,23 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 - (void)loadDictionaryObjectsFromCollection:(NSString *)collectionName
                                  withParams:(NSDictionary *)parameters
-                                 completion:(BAAArrayResultBlock)completionBlock
-{
+                                 completion:(BAAArrayResultBlock)completionBlock {
+    
     [self getPath:[NSString stringWithFormat:@"document/%@",collectionName]
        parameters:parameters
-          success:^(id responseObject)
-     {
+          success:^(id responseObject) {
+              
          NSArray *objects = responseObject[@"data"];
          NSMutableArray *result = [NSMutableArray array];
          
-         for (NSDictionary *d in objects)
-         {
+         for (NSDictionary *d in objects) {
+             
              [result addObject:d];
          }
          
          completionBlock(result, nil);
-     }
-          failure:^(NSError *error)
-     {
+     } failure:^(NSError *error) {
+         
          completionBlock(nil, error);
      }];
 }
