@@ -1201,11 +1201,11 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 #if TARGET_OS_IPHONE
 #ifdef UIKIT_EXTERN
     
-    // TODO: v. 8.0
-    /*
     if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerForRemoteNotifications)]) {
-        [[UIApplication sharedApplication] performSelector:@selector(registerForRemoteNotification)];
-    } else */{
+        
+        [[UIApplication sharedApplication] performSelector:@selector(registerForRemoteNotifications)];
+    } else {
+        
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
     }
