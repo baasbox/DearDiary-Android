@@ -133,6 +133,7 @@ NSArray * BAAQueryStringPairsFromKeyAndValue(NSString *key, id value) {
 
 @property (nonatomic, copy) NSString *appCode;
 @property (nonatomic, strong) NSURLSession *session;
+@property (copy, nonatomic) NSString *appGroupName;
 
 - (BAAUser *) loadUserFromDisk;
 - (void)_initSession;
@@ -154,6 +155,18 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     return sharedBAAClient;
 }
 
++ (instancetype)sharedClientWithAppGroupName:(NSString *)appGroupName {
+    
+    static BAAClient *sharedBAAClient = nil;
+    static dispatch_once_t onceBAAToken;
+
+    dispatch_once(&onceBAAToken, ^{
+        sharedBAAClient = [[BAAClient alloc] initWithAppGroupName:appGroupName];
+    });
+    
+    return sharedBAAClient;
+}
+
 - (id) init {
     
     if (self = [super init]) {
@@ -163,6 +176,20 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
         [self _initSession];
         
 	}
+    
+    return self;
+}
+
+- (id) initWithAppGroupName:(NSString *)appGroupName {
+    
+    if (self = [super init]) {
+        
+        _baseURL = [NSURL URLWithString:[BaasBox baseURL]];
+        _appCode = [BaasBox appCode];
+        _appGroupName = appGroupName;
+        
+        [self _initSession];
+    }
     
     return self;
 }
@@ -383,6 +410,30 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                            kPageSizeKey : [NSNumber numberWithInteger:kPageLength]}
               completion:completionBlock];
     
+}
+
+- (void)loadDictionaryObjectsFromCollection:(NSString *)collectionName
+                                 withParams:(NSDictionary *)parameters
+                                 completion:(BAAArrayResultBlock)completionBlock
+{
+    [self getPath:[NSString stringWithFormat:@"document/%@",collectionName]
+       parameters:parameters
+          success:^(id responseObject)
+     {
+         NSArray *objects = responseObject[@"data"];
+         NSMutableArray *result = [NSMutableArray array];
+         
+         for (NSDictionary *d in objects)
+         {
+             [result addObject:d];
+         }
+         
+         completionBlock(result, nil);
+     }
+          failure:^(NSError *error)
+     {
+         completionBlock(nil, error);
+     }];
 }
 
 - (void) createObject:(BAAObject *)object completion:(BAAObjectResultBlock)completionBlock {
@@ -789,6 +840,33 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 }
 
+- (void)grantAccessToCollection:(NSString *)collectionName
+                       objectId:(NSString *)objectId
+                         toRole:(NSString *)roleName
+                     accessType:(NSString *)access
+                     completion:(BAAObjectResultBlock)completionBlock
+{
+    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
+                      collectionName,objectId, access, roleName];
+    
+    [[BAAClient sharedClient] putPath:path
+                           parameters:nil
+                              success:^(id responseObject)
+     {
+         
+         completionBlock(self, nil);
+         
+     }
+                              failure:^(NSError *error)
+     {
+         
+         if (completionBlock)
+         {
+             completionBlock(nil, error);
+         }
+         
+     }];
+}
 
 // Both methods are ugly, but at the moment let's live with these
 - (NSString *) buildPathForRoleACL:(id)element forAccessType:(NSString *)accessType roleName:(NSString *)role {
