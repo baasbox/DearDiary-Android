@@ -6,7 +6,7 @@ buildscript {
 
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 
@@ -22,7 +22,7 @@ repositories {
 
 android {
         compileSdkVersion 19
-        buildToolsVersion "19.0.1"
+        buildToolsVersion "19.1.0"
         sourceSets {
            main{
                 manifest.srcFile 'AndroidManifest.xml'
@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.0.0'
-    compile 'com.android.support:appcompat-v7:19.0.0'
-    compile files('libs/baasbox-android-0.7.3.jar')
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+    compile 'com.baasbox:baasbox-android:0.8.+'
 }
