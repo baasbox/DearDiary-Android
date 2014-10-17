@@ -1222,6 +1222,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 - (void) askToEnablePushNotifications {
     
+#if TARGET_OS_IPHONE
 #ifndef EXTENSION
     #if __IPHONE_OS_VERSION_MIN_REQUIRED  >= 80000
     
@@ -1237,6 +1238,9 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
     
     #endif
+#endif
+#else
+    
 #endif
 }
 
