@@ -318,7 +318,8 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     if (self.currentUser.pushNotificationToken) {
         path = [NSString stringWithFormat:@"logout/%@", self.currentUser.pushNotificationToken];
     }
-    
+
+
     [self postPath:path
         parameters:nil
            success:^(id responseObject) {
@@ -1672,12 +1673,19 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 #pragma mark - Helpers
 
 - (void) saveUserToDisk:(BAAUser *)user {
-    
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
-    [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
-    [defaults synchronize];
+
+    if (user) {
+        
+        NSData *encodedUser = [NSKeyedArchiver archivedDataWithRootObject:user];
+        [defaults setValue:encodedUser forKey:BAAUserKeyForUserDefaults];
+    } else {
+        
+        [defaults removeObjectForKey:BAAUserKeyForUserDefaults];
+    }
     
+    [defaults synchronize];
 }
 
 - (BAAUser *) loadUserFromDisk {
