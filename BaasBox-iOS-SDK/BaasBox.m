@@ -53,14 +53,19 @@
     if (response == nil) {
         NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:@"Server returned an empty response.",
                                       @"iOS SDK Version" : VERSION};
-        return [NSError errorWithDomain:[BaasBox errorDomain]
-                                   code:-22222
-                               userInfo:errorDetail];
+        NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
+                                             code:-22222
+                                         userInfo:errorDetail];
+        
+        if (error) {
+            return error;
+        }
     }
 
     NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:response[@"message"],
                                   @"BaasBox_API_version": @[response[@"API_version"]],
                                   @"iOS SDK Version" : VERSION};
+    
     NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
                                          code:-22222
                                      userInfo:errorDetail];

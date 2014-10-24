@@ -332,6 +332,9 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                
            } failure:^(NSError *error) {
                
+               self.currentUser = nil;
+               [self saveUserToDisk:self.currentUser];
+
                if (completionHander)
                    completionHander(NO, error);
                
@@ -1529,10 +1532,10 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
                          
                          if (httpResponse.statusCode >= 400) {
                              
-                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];                            
+                             NSError *error = [BaasBox authenticationErrorForResponse:jsonObject];
                              failure(error);
+
                              return;
-                             
                          }
                          
                          if (error == nil) {
