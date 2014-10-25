@@ -31,6 +31,7 @@
 
 + (void) getFilesWithCompletion:(BAAArrayResultBlock)completionBlock;
 - (NSURL *) fileURL;
++ (void) loadFileWithId:(NSString *)fileId completion:(void(^)(NSData *data, NSError *error))completionBlock;
 - (void) loadFileWithCompletion:(void(^)(NSData *data, NSError *error))completionBlock;
 - (void) loadFileWithParameters:(NSDictionary *)parameters completion:(void(^)(NSData *data, NSError *error))completionBlock;
 + (void) loadFileDetails:(NSString *)fileId completion:(BAAObjectResultBlock)completionBlock;
@@ -42,5 +43,6 @@
 - (void) revokeAccessToRole:(NSString *)roleName ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock;
 - (void) revokeAccessToUser:(NSString *)username ofType:(NSString *)accessType completion:(BAAObjectResultBlock)completionBlock;
 - (void) deleteFileWithCompletion:(BAABooleanResultBlock)completionBlock;
++ (void) deleteFileWithId:(NSString *)fileId completion:(BAABooleanResultBlock)completionBlock;
 
 @end

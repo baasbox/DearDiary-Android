@@ -104,27 +104,7 @@
     
     [client deleteObject:self
               completion:completionBlock];
-}
-
-- (void)grantAccessToRole:(NSString *)roleName
-               accessType:(NSString *)access
-               completion:(void (^)(BOOL success))handler
-{
-    NSString *path = [NSString stringWithFormat:@"%@/%@/%@/role/%@",
-                      self.collectionName,self.objectId, access, roleName];
     
-    [[BAAClient sharedClient] putPath:path
-                           parameters:nil
-                              success:^(id responseObject)
-     {
-         if (handler)
-             handler(YES);
-     }
-                              failure:^(NSError *error)
-     {
-         if (handler)
-             handler(NO);
-     }];
 }
 
 #pragma mark - ACL
@@ -168,7 +148,8 @@
 
 - (NSString *) collectionName {
     
-    return @"OVERRIDE THIS METHOD";
+    return @"OVERWRITE THIS METHOD";
+    
 }
 
 #pragma mark - Counter methods
@@ -184,9 +165,6 @@
 #pragma mark - Helper methods
 
 - (NSDictionary*) objectAsDictionary {
-    
-    if ([self respondsToSelector:@selector(dictionaryRepresentation)])
-        return [self performSelector:@selector(dictionaryRepresentation)];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:0];
     
@@ -280,11 +258,11 @@
 
 + (void) getRandomObjectsWithParams:(NSDictionary *)parameters bound:(NSInteger)bound completion:(BAAArrayResultBlock)completionBlock {
     
-    [[self class] getObjectsWithParams:parameters completion:^(NSArray *objects, NSError *error) {
+    if (completionBlock) {
         
-        if (error == nil) {
+        [[self class] getObjectsWithParams:parameters completion:^(NSArray *objects, NSError *error) {
             
-            if (completionBlock) {
+            if (error == nil) {
                 
                 if (bound > objects.count) {
                     
@@ -307,19 +285,13 @@
                     
                 }
                 
-            }
-            
-        } else {
-            
-            if (completionBlock) {
+            } else {
                 
                 completionBlock(nil, error);
                 
             }
-        }
-        
-    }];
-    
+        }];
+    }
 }
 
 @end
