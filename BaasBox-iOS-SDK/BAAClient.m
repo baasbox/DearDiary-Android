@@ -327,13 +327,17 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
         parameters:nil
            success:^(id responseObject) {
                
+               self.currentUser = nil;
+               [self saveUserToDisk:self.currentUser];
+               
                if (completionHandler) {
-                   self.currentUser = nil;
-                   [self saveUserToDisk:self.currentUser];
                    completionHandler(YES, nil);
                }
                
            } failure:^(NSError *error) {
+               
+               self.currentUser = nil;
+               [self saveUserToDisk:self.currentUser];
                
                if (completionHandler) {
                    completionHandler(NO, error);
