@@ -1697,11 +1697,11 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 - (void) saveUserToDisk:(BAAUser *)user {
     
-    NSUserDefaults *defaults;
+    NSUserDefaults *defaults = [NSUserDefaults alloc];
     
-    if ([UIDevice currentDevice].systemVersion.integerValue >= 8 && self.appGroupName) {
+    if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName) {
         
-        defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+        defaults = [defaults initWithSuiteName:self.appGroupName];
     } else {
         
         defaults = [NSUserDefaults standardUserDefaults];
@@ -1715,11 +1715,11 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
 
 - (BAAUser *) loadUserFromDisk {
 
-    NSUserDefaults *defaults;
-
-    if ([UIDevice currentDevice].systemVersion.integerValue >= 8 && self.appGroupName) {
+    NSUserDefaults *defaults = [NSUserDefaults alloc];
+    
+    if ([defaults respondsToSelector:@selector(initWithSuiteName:)] && self.appGroupName) {
         
-        defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+        defaults = [defaults initWithSuiteName:self.appGroupName];
     } else {
         
         defaults = [NSUserDefaults standardUserDefaults];
