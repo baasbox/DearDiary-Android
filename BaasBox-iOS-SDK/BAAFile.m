@@ -93,7 +93,7 @@
     
 }
 
-+ (void)loadFileWithFileId:(NSString *)fileId completion:(void (^)(NSData *, NSError *))completionBlock {
++ (void) loadFileWithId:(NSString *)fileId completion:(void(^)(NSData *data, NSError *error))completionBlock {
     
     if (fileId && completionBlock) {
         
@@ -218,6 +218,17 @@
     [self.client deleteFile:self
                  completion:completionBlock];
     
+}
+
++ (void)deleteFileWithId:(NSString *)fileId completion:(BAABooleanResultBlock)completionBlock {
+    
+    if (fileId && completionBlock) {
+        
+        BAAFile *file = [[BAAFile alloc] init];
+        file.fileId = fileId;
+        [file deleteFileWithCompletion:completionBlock];
+        
+    }
 }
 
 @end

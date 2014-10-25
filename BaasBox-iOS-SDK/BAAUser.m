@@ -36,6 +36,7 @@
 
 @implementation BAAUser
 
+
 - (instancetype) initWithDictionary:(NSDictionary *)dict {
 
     self = [super init];
@@ -72,12 +73,6 @@
     
     return self;
     
-}
-
-+ (BAAUser *)userWithUsername:(NSString *)username
-{
-    BAAUser *user = [[BAAUser alloc] initWithDictionary:@{@"user":@{@"name":username}}];
-    return user;
 }
 
 #pragma mark - Load
@@ -129,6 +124,42 @@
                              
                          }];
     
+}
+
++ (void) loadRandomUserWithCompletion:(BAAArrayResultBlock)completionBlock {
+    
+    if (completionBlock) {
+        
+        [self loadUsersWithParameters:@{} completion:^(NSArray *users, NSError *error) {
+            
+            if (error == nil) {
+                
+                if (users.count <= 1) {
+                    
+                    // This is the edge case where this user is the only user.
+                    completionBlock(@[],  nil);
+                    
+                } else {
+                    
+                    BAAUser *currentUser = [[BAAClient sharedClient] currentUser];
+                    BAAUser *randomUser;
+                    
+                    do {
+                        
+                        NSInteger randomIndex = arc4random_uniform((u_int32_t)users.count);
+                        randomUser = users[randomIndex];
+                        
+                    } while ([randomUser.username isEqualToString:currentUser.username]);  // Ensures that the random user is not the current user.
+                    
+                    completionBlock([NSArray arrayWithObject:randomUser], nil);
+                    
+                }
+                
+            } else {
+                completionBlock(nil, error);
+            }
+        }];
+    }
 }
 
 + (void) loadUserDetails:(NSString *)username completion:(BAAObjectResultBlock)completionBlock {
@@ -321,11 +352,6 @@
 
 #pragma mark - Follow/Unfollow
 
-+ (void) followUserWithUsername:(NSString *)username completion:(BAAObjectResultBlock)completionBlock {
-    BAAUser *user = [BAAUser userWithUsername:username];
-    [self followUser:user completion:completionBlock];
-}
-
 + (void) followUser:(BAAUser *)user completion:(BAAObjectResultBlock)completionBlock {
 
     BAAClient *client = [BAAClient sharedClient];
@@ -337,12 +363,6 @@
                 
             }];
     
-}
-
-+ (void) unfollowUserWithUsername:(NSString *)username completion:(BAABooleanResultBlock)completionBlock {
-
-    BAAUser *user = [BAAUser userWithUsername:username];
-    [self unfollowUser:user completion:completionBlock];
 }
 
 + (void) unfollowUser:(BAAUser *)user completion:(BAABooleanResultBlock)completionBlock {
@@ -406,7 +426,6 @@
     }
     
     free(propertyList);
-    //    NSLog(@"result is %@", result);
     return [NSDictionary dictionaryWithDictionary:result];
     
 }
@@ -487,6 +506,10 @@
         decodeObject(_authenticationToken);
         decodeObject(_pushNotificationToken);
         decodeBool(_pushEnabled);
+        decodeObject(_visibleByAnonymousUsers);
+        decodeObject(_visibleByRegisteredUsers);
+        decodeObject(_visibleByFriends);
+        decodeObject(_visibleByTheUser);
         
     }
     
@@ -500,6 +523,10 @@
     encodeObject(_authenticationToken);
     encodeObject(_pushNotificationToken);
     encodeBool(_pushEnabled);
+    encodeObject(_visibleByAnonymousUsers);
+    encodeObject(_visibleByRegisteredUsers);
+    encodeObject(_visibleByFriends);
+    encodeObject(_visibleByTheUser);
     
 }
 
