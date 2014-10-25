@@ -1200,7 +1200,7 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 #if TARGET_OS_IPHONE
     
-    #if __IPHONE_OS_VERSION_MIN_REQUIRED  >= 80000
+    #if __IPHONE_OS_VERSION_MIN_REQUIRED  >= __IPHONE_8_0
         
         UIUserNotificationSettings *settings =
         [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert |UIUserNotificationTypeBadge |  UIUserNotificationTypeSound
