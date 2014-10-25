@@ -1204,21 +1204,19 @@ NSString* const BAAUserKeyForUserDefaults = @"com.baaxbox.user";
     
 #if TARGET_OS_IPHONE
     
-    #if __IPHONE_OS_VERSION_MIN_REQUIRED  >= __IPHONE_8_0
-        
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerForRemoteNotifications)]) {
+
         UIUserNotificationSettings *settings =
         [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert |UIUserNotificationTypeBadge |  UIUserNotificationTypeSound
                                           categories:nil];
         [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
         [[UIApplication sharedApplication] registerForRemoteNotifications];
-        
-    #else
+    } else {
         
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
          (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-        
-    #endif
-    
+    }
+
 #else
     
     [[NSApplication sharedApplication] registerForRemoteNotificationTypes:
