@@ -75,6 +75,12 @@
     
 }
 
++ (BAAUser *)userWithUsername:(NSString *)username
+{
+    BAAUser *user = [[BAAUser alloc] initWithDictionary:@{@"user":@{@"name":username}}];
+    return user;
+}
+
 #pragma mark - Load
 
 + (void) loadCurrentUserWithCompletion:(BAAObjectResultBlock)completionBlock {
