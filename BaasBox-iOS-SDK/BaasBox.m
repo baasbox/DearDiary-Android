@@ -18,7 +18,7 @@
 @implementation BaasBox
 
 + (void) setBaseURL:(NSString *)URL appCode:(NSString *)code {
-
+    
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:URL forKey:BASE_URL_KEY];
     [userDefaults setObject:code forKey:APP_CODE_KEY];
@@ -27,7 +27,7 @@
 }
 
 + (NSString *) baseURL {
-
+    
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     return (NSString *) [userDefaults objectForKey:BASE_URL_KEY];
     
@@ -49,34 +49,26 @@
 }
 
 + (NSError *)authenticationErrorForResponse:(NSDictionary *)response {
-
+    
     @try {
         
-        if (response == nil) {
-            NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:@"Server returned an empty response.",
-                                          @"BaasBox API Version": @[response[@"API_version"]],
+        if (response) {
+            NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:response[@"message"],
+                                          @"BaasBox_API_version": @[response[@"API_version"]],
                                           @"iOS SDK Version" : VERSION};
-            return [NSError errorWithDomain:[BaasBox errorDomain]
-                                       code:-22222
-                                   userInfo:errorDetail];
+            NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
+                                                 code:-22222
+                                             userInfo:errorDetail];
+            return error;
         }
-        
-        NSDictionary *errorDetail = @{NSLocalizedDescriptionKey:response[@"message"],
-                                      @"BaasBox_API_version": @[response[@"API_version"]],
-                                      @"iOS SDK Version" : VERSION};
-        NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
-                                             code:-22222
-                                         userInfo:errorDetail];
-        return error;
     }
     @catch (NSException *exception) {
         
-        NSError *error = [NSError errorWithDomain:[BaasBox errorDomain]
-                                             code:-22222
-                                         userInfo:nil];
-        
-        return error;
     }
+    
+    return [NSError errorWithDomain:[BaasBox errorDomain]
+                               code:-22222
+                           userInfo:nil];
 }
 
 + (NSDateFormatter *)dateFormatter {
