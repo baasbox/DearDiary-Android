@@ -28,7 +28,7 @@ and you are ready to go.
 Using gradle is even simpler you just need to add the following line to your dependencies
 
 ```groovy
-compile 'com.baasbox:baasbox-android:0.7.3-alpha'
+    compile 'com.baasbox:baasbox-android:0.8.+'
 ```
 After refreshing your ide, you should be able to use the sdk classes in your project
 
