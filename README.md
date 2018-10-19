@@ -73,7 +73,7 @@ can be distinguished on the backed.
 The sample project includes a barebone LoginActivity, we are going to integrate it in
 the app.
 
-The first thing to do is to check if there is alrady an an authenticated user for this device.
+The first thing to do is to check if there is already an authenticated user for this device.
 Open the NoteListActivity file and right at the start of onCreate, where is the *todo 1* mark
 add the following lines.
 
